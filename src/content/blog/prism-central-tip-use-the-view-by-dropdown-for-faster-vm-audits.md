@@ -2,6 +2,7 @@
 title: "Prism Central Tip: Use the “View By” Dropdown for Faster VM Audits"
 description: "Most admins stick to searching or sorting in the VM list, but the **View by** dropdown in [Nutanix](https://www.nutanix.com/) Prism Central is a much faster way to spot issues."
 pubDate: 'Feb 16 2026'
+heroImage: '../../assets/blog/prism-central-view-by-hero.png'
 categories: ["Nutanix", "Prism Central", "Tips"]
 ---
 Most admins stick to searching or sorting in the VM list, but the **View by** dropdown in [Nutanix](https://www.nutanix.com/) Prism Central is a much faster way to spot issues.

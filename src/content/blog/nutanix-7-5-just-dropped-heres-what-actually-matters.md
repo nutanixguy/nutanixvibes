@@ -2,6 +2,7 @@
 title: "Nutanix 7.5 Just Dropped – Here's What Actually Matters"
 description: "So Nutanix pushed out AOS 7.5, AHV 11, and Prism Central 7.5 back in December, and honestly? There's some good stuff in here. Like, actually useful stuff—not just marketing fluff."
 pubDate: 'Jan 30 2026'
+heroImage: '../../assets/blog/nutanix-7-5-hero.png'
 categories: ["AHV", "CVM", "NGT", "Nutanix", "Prism Central"]
 ---
 So Nutanix pushed out AOS 7.5, AHV 11, and Prism Central 7.5 back in December, and honestly? There's some good stuff in here. Like, actually useful stuff—not just marketing fluff.
