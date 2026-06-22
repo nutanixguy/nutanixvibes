@@ -4,9 +4,17 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import { defineConfig, fontProviders } from 'astro/config';
 
+// GitHub project Pages serves from /nutanixvibes/ until a custom domain is live.
+const base = process.env.ASTRO_BASE ?? '/';
+const site =
+	base === '/'
+		? 'https://nutanixvibes.com'
+		: 'https://nutanixguy.github.io';
+
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://nutanixvibes.com',
+	site,
+	base,
 	integrations: [mdx(), sitemap()],
 	fonts: [
 		{
