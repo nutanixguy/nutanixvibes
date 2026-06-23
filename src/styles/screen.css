@@ -619,6 +619,68 @@ The first (most recent) post in the list is styled to be bigger than the others 
     }
 }
 
+/* Static pages: keep body text below the hero image */
+.post-full.page .post-full-image.page-hero-image {
+    display: block;
+    margin: 0 -10vw 5vw;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.post-full.page .post-full-image.page-hero-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 21 / 9;
+    max-height: 520px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+@media (max-width: 1170px) {
+    .post-full.page .post-full-image.page-hero-image {
+        margin: 0 -4vw 5vw;
+    }
+
+    .post-full.page .post-full-image.page-hero-image img {
+        max-height: 460px;
+        border-radius: 0;
+    }
+}
+
+@media (max-width: 800px) {
+    .post-full.page .post-full-image.page-hero-image img {
+        aspect-ratio: 16 / 9;
+        max-height: 360px;
+    }
+}
+
+@media (max-width: 500px) {
+    .post-full.page .post-full-image.page-hero-image {
+        margin: 0 -4vw 8vw;
+    }
+
+    .post-full.page .post-full-image.page-hero-image img {
+        aspect-ratio: 16 / 9;
+        max-height: none;
+        height: auto;
+    }
+}
+
+.post-full.page .post-full-content {
+    position: static;
+    padding-top: 0;
+    margin-top: 0;
+}
+
+.post-full.page .post-full-content:before,
+.post-full.page .post-full-content:after {
+    display: none;
+}
+
 .post-full-content {
     position: relative;
     margin: 0 auto;

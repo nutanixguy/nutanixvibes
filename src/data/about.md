@@ -1,6 +1,7 @@
 ---
 current: about
-title: About
+title: About Me
+cover: assets/images/about-hero.jpg
 navigation: true
 logo: 'assets/images/cropped-image.jpg'
 class: page-template
