@@ -2,7 +2,7 @@ import { defineConfig, fontProviders } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
-  site: process.env.SITE_URL || 'https://casper.leons.dev',
+  site: process.env.SITE_URL || 'https://nutanixvibes.com',
   base: process.env.BASE_PATH || '/',
   markdown: {
     shikiConfig: {

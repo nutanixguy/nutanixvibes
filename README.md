@@ -6,16 +6,10 @@ Tech blog built with [Casper Astro](https://github.com/AntonyLeons/casper) and h
 
 ```bash
 npm install
-SITE_URL=https://nutanixguy.github.io BASE_PATH=/nutanixvibes/ npm run dev
+SITE_URL=https://nutanixvibes.com npm run dev
 ```
 
-Open [http://localhost:4321/nutanixvibes/](http://localhost:4321/nutanixvibes/).
-
-For local preview without the GitHub Pages subpath:
-
-```bash
-npm run dev
-```
+Open [http://localhost:4321/](http://localhost:4321/).
 
 ## Content
 
@@ -37,9 +31,9 @@ Note: the import script targets the legacy blog layout. After migrating to Caspe
 
 ## Deploy
 
-Pushes to `main` deploy via GitHub Actions.
+Pushes to `main` deploy via GitHub Actions to https://nutanixvibes.com
 
-GitHub project Pages uses `BASE_PATH=/nutanixvibes/` during CI builds. When `nutanixvibes.com` is connected as a custom domain, remove `BASE_PATH` from `.github/workflows/deploy.yml`.
+Set the custom domain in GitHub repo **Settings → Pages** and point DNS at GitHub Pages (see [GitHub docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site)).
 
 ## Social links
 
