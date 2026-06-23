@@ -73,6 +73,14 @@ const isoDate = articleDate ? new Date(articleDate).toISOString() : undefined;
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
 
+<!-- RSS -->
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  title={SITE_CONFIG.title}
+  href={new URL(getAssetUrl('/feed.xml'), Astro.site || Astro.url).toString()}
+/>
+
 <!-- Primary Meta Tags -->
 <title>{displayTitle}</title>
 <meta name="title" content={displayTitle} />
