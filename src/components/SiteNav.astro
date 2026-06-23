@@ -6,6 +6,7 @@ import Twitter from './icons/Twitter.astro';
 import X from './icons/X.astro';
 import Github from './icons/Github.astro';
 import LinkedIn from './icons/LinkedIn.astro';
+import Email from './icons/Email.astro';
 import Rss from './icons/Rss.astro';
 import Search from './icons/Search.astro';
 import Sun from './icons/Sun.astro';
@@ -73,7 +74,7 @@ const showLogo = current !== 'home';
             )}
             {SITE_CONFIG.email && (
                 <a class="social-link social-link-mail" href={`mailto:${SITE_CONFIG.email}`} aria-label="Email">
-                    @
+                    <Email style="width:16px;height:16px;" />
                 </a>
             )}
             <a class="social-link social-link-rss" href={getAssetUrl('/feed.xml')} aria-label="RSS Feed">
