@@ -1,0 +1,8 @@
+---
+import { getAssetUrl } from '../config';
+---
+<ul class="nav" role="menu">
+    <li class="nav-home" role="menuitem"><a href={getAssetUrl('/')}>Home</a></li>
+    <li class="nav-about" role="menuitem"><a href={getAssetUrl('/about/')}>About Me</a></li>
+    <li class="nav-rss" role="menuitem"><a href={getAssetUrl('/feed.xml')}>RSS</a></li>
+</ul>
