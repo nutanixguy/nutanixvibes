@@ -65,7 +65,7 @@ The certification YAML is not its own page. `src/pages/about.astro` renders it a
 | `src/pages/` | Routes. A file here becomes a URL. `src/pages/quest.astro` is `/quest`. |
 | `src/components/Header.astro` | Nav. Start here and GitHub stats are in this list. Certifications and Quest are not. |
 | `src/components/Card.astro` | Post card on the home page, the posts list, and Start here. |
-| `src/components/PostMeta.astro` | Level and topic badges, plus the session-notes block on a post. |
+| `src/components/PostMeta.astro` | Level and topic badges, plus the "Before you start" block on a post. |
 | `src/layouts/Layout.astro` | HTML shell, fonts, and the script that sets dark mode before the first paint. |
 | `src/styles/theme.css` | Colors. Dark is the default on `:root`. Light is `[data-theme="light"]`. Hex values are cited in section 5. |
 | `src/styles/global.css` | Grid background and the scanline overlay. |
@@ -146,7 +146,7 @@ That file's `:root` block is the source. `src/styles/theme.css` names the same c
 
 ### Quest id stays in the data and off the post
 
-`quest_id` is still an optional field in `src/content.config.ts`, and both posts still set it. `src/components/PostMeta.astro` no longer prints that value or a link to `/quest`. A post whose only session field is `quest_id` does not get a Session notes box. Estimated time, updated date, prerequisites, and objectives still render. `/quest` still lists the ids that are already on the posts. That page was not changed.
+`quest_id` is still an optional field in `src/content.config.ts`, and both posts still set it. `src/components/PostMeta.astro` no longer prints that value or a link to `/quest`. A post whose only extra field is `quest_id` does not get a Before you start box. Estimated time, updated date, prerequisites, and objectives still render. The heading visitors see is "Before you start", and its id is `before-you-start-heading`. `/quest` still lists the ids that are already on the posts. That page was not changed.
 
 ### Certifications live on About
 
