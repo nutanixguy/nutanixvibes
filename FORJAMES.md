@@ -47,6 +47,8 @@ flowchart TD
 
 `public/pagefind/` is gitignored (`.gitignore`). It exists so a later `astro dev` can serve an index you already built. `astro preview` serves `dist/`, which already contains the index.
 
+The certification YAML is not its own page. `src/pages/about.astro` renders it at `/about#certifications`. `src/pages/certifications.astro` is a meta refresh to that anchor.
+
 ## 3. Codebase map
 
 | Path | What it is |
@@ -56,14 +58,16 @@ flowchart TD
 | `src/config.ts` | Applies defaults on top of `astro-paper.config.ts`. Do not put content here. |
 | `src/content.config.ts` | Schema for posts, pages, and the certifications collection. Same role as a validated object schema in a Desired State config. |
 | `src/content/posts/` | The two migrated posts. |
-| `src/content/pages/about.md` | About page body. Same prose as the old `src/data/about.md` on `main`. |
+| `src/content/pages/about.md` | About page prose. Same text as the old `src/data/about.md` on `main`. |
+| `src/pages/about.astro` | Renders that prose, then the certifications section at `#certifications`. |
 | `src/content/certifications/` | Two fake YAML entries. The schema requires `label: EXAMPLE`. |
+| `src/pages/certifications.astro` | Static redirect to `/about#certifications`. Not a content page. |
 | `src/pages/` | Routes. A file here becomes a URL. `src/pages/quest.astro` is `/quest`. |
-| `src/components/Header.astro` | Nav. Start here, Certifications, and GitHub stats are in this list. Quest is not. |
+| `src/components/Header.astro` | Nav. Start here and GitHub stats are in this list. Certifications and Quest are not. |
 | `src/components/Card.astro` | Post card on the home page, the posts list, and Start here. |
 | `src/components/PostMeta.astro` | Level and topic badges, plus the session-notes block on a post. |
 | `src/layouts/Layout.astro` | HTML shell, fonts, and the script that sets dark mode before the first paint. |
-| `src/styles/theme.css` | Colors. Dark is the default on `:root`. Light is `[data-theme="light"]`. |
+| `src/styles/theme.css` | Colors. Dark is the default on `:root`. Light is `[data-theme="light"]`. Hex values are cited in section 5. |
 | `src/styles/global.css` | Grid background and the scanline overlay. |
 | `src/pages/search.astro` | Pagefind UI. No Algolia. |
 | `public/assets/images/` | Cover images kept from the Casper site. |
@@ -109,10 +113,44 @@ On `main`, `src/components/AlgoliaSearch.astro` loaded Algolia from a CDN when `
 
 The Casper `package.json` on `main` depends on `astro` `^6.4.7`. This branch uses the current AstroPaper package set, which is Astro 7. The resolved version in this environment is 7.4.4. Node was raised to `>=22.23.4` because that is the engine AstroPaper declares. The machine that built this branch was already on v22.23.4.
 
+### Nutanix colors
+
+The first preview used a terminal green I picked (`#3ddc97` / `#085232`). That is gone.
+
+The July 2026 partner PDF at `https://www.nutanix.com/content/dam/nutanix/en/cmn/documents/nutanix-brandbook.pdf` says the logo is only Charcoal Gray or white, and that a wider brand palette exists. The PDF text does not include hex values. I did not add a logo or a wordmark.
+
+The hex values are from the stylesheet the nutanix.com homepage linked on 1 Nov 2026:
+
+`https://static-p136464-e1403605.adobeaemcloud.com/ba0aa07b7a03dea49fca8f8f6ae1149fc70abfa9379acb892e5d78b51491651f/clientlib-site/theme.css`
+
+That file's `:root` block is the source. `src/styles/theme.css` names the same custom properties.
+
+| UI token | Hex | Nutanix.com CSS | Contrast I calculated |
+| --- | --- | --- | --- |
+| Light background | `#ffffff` | `--btn-neutral-background-dark` | Body `#131313` on this is 18.58:1 |
+| Light text | `#131313` | `--black` | 18.58:1 on `#ffffff`, 17.19:1 on `#f6f6f6` |
+| Light accent | `#7855fa` | `--btn-brand-background`, `--btn-brand-text-link` | 4.69:1 on `#ffffff` |
+| Light text on accent | `#ffffff` | `--btn-brand-text` | 4.69:1 on `#7855fa` |
+| Light muted surface | `#f6f6f6` | `background:#f6f6f6` in that stylesheet | Body text on it is 17.19:1 |
+| Light secondary text | `#595959` | `--secondary-text` | 7.00:1 on `#ffffff`, 6.48:1 on `#f6f6f6` |
+| Light border | `#c7c7c7` | `--btn-neutral-background-dark-pressed` | Border, not body text |
+| Dark background | `#131313` | `--black`, `--btn-neutral-background` | Body `#ffffff` on this is 18.58:1 |
+| Dark text | `#ffffff` | `--btn-neutral-text`, `--btn-brand-text` | 18.58:1 on `#131313` |
+| Dark accent | `#a188fc` | `--btn-brand-text-dark-link`, `--btn-brand-text-dark-outlined` | 6.59:1 on `#131313` |
+| Dark text on accent | `#131313` | `--black` | 6.59:1 on `#a188fc`. White on `#a188fc` is 2.82:1, so it is not used. |
+| Dark muted surface | `#2a2a2a` | `--btn-neutral-background-hover` | Body text on it is 14.35:1 |
+| Dark secondary text | `#c7c7c7` | `--btn-neutral-background-dark-pressed` | 10.99:1 on `#131313` |
+| Dark border | `#474747` | `--btn-neutral-background-pressed` | Border, not body text |
+
+`#7855fa` on `#131313` is 3.96:1, under AA for normal text, so dark mode uses the dark-link purple instead. `#595959` on `#131313` is 2.65:1, so dark secondary text does not use `--secondary-text`. No automated axe scan was run. These ratios are from a local WCAG calculation, not from Nutanix.
+
+### Certifications live on About
+
+The standalone certifications page is gone from the nav. The same two YAML files still feed a section on the About page, `src/pages/about.astro`, at `/about#certifications`. `src/pages/certifications.astro` is a noindex meta refresh to that anchor. Chrome followed `http://127.0.0.1:4321/certifications/` to `http://127.0.0.1:4321/about#certifications` and the section was on the page. The sitemap filter in `astro.config.ts` drops `/certifications`. The cards are still labeled EXAMPLE.
+
 ### Other choices
 
 - Dark is the default. `src/layouts/Layout.astro` puts `data-theme="dark"` on `<html>`. The boot script stays on dark unless `localStorage` is exactly `"light"` or `"dark"`. `src/scripts/theme.ts` uses the same rule when nothing is stored. A later operating-system theme change still overwrites that choice. That listener was not exercised.
-- Accent color is terminal green: `#3ddc97` on `#07140e` in dark mode, `#085232` on `#f4f7f4` in light mode (`src/styles/theme.css`). Contrast ratios were calculated locally before those values were picked (about 10.6:1 and 8.6:1 for accent text). No axe or screen-reader pass was run.
 - The header is `max-w-6xl` so the extra nav links fit. Article text stays `max-w-3xl` (`src/styles/global.css`).
 - Post URLs are now `/posts/{filename}`. Example: `/posts/prism-central-tip-use-the-view-by-dropdown-for-faster-vm-audits/`.
 - `updated` on both posts equals `pubDatetime`. The Casper files had one `date` and no revision date. Both timestamps are `12:00:00.000Z` so the calendar day stays 30 Jan 2026 and 16 Feb 2026 in `America/New_York`.
@@ -120,8 +158,8 @@ The Casper `package.json` on `main` depends on `astro` `^6.4.7`. This branch use
 - Level `beginner` on the View by post: it is a Prism Central UI tip. Level `intermediate` on the 7.5 post: it assumes CVM, CCLM, NGT, and protection policies.
 - Timezone `America/New_York` is an assumption. The about page says "Based in Georgia." The removed author file on `main` (`src/content/authors/jamie.json`) said "Georgia, USA". If that Georgia is the country, this timezone is wrong.
 - `features.editPost.enabled` is false. The theme default pointed at `github.com/satnaing/astro-paper`.
-- Certifications are fake on purpose. `src/content.config.ts` only accepts `label: EXAMPLE`. Real credential names remain prose in `src/content/pages/about.md`. They are not loaded as data.
-- `/quest` is a coming-soon page and is not in the nav. The task asked for the other three routes in the nav only.
+- Certifications are fake on purpose. `src/content.config.ts` only accepts `label: EXAMPLE`. Real credential names remain prose in `src/content/pages/about.md`. They are not loaded as data. The cards render under that prose, at `#certifications`.
+- `/quest` is a coming-soon page and is not in the nav. Start here and GitHub stats are.
 - `package.json` overrides `@astrojs/markdown-satteri` to `0.4.6`. See section 7.
 - AstroPaper's own `.github/workflows/ci.yml` uses pnpm and runs on pull requests. It was not copied. The template has no deploy workflow, so there was nothing to delete. This branch's only workflow is the original `deploy.yml`.
 
@@ -168,18 +206,16 @@ Run on this branch in this environment, after `npm ci`:
 2. `npm ci` completed (578 packages) after the override in section 7.
 3. `npm run format:check` passed.
 4. `npm run lint` passed (exit 0, no findings).
-5. `npm run build` passed. `astro check` reported 0 errors, 0 warnings, 0 hints. Astro 7.4.4 wrote 19 pages, including `/`, `/start-here/`, `/certifications/`, `/github-stats/`, `/quest/`, `/search/`, and both posts. Pagefind indexed 2 pages and 505 words.
+5. After the Nutanix color change, `npm run lint` passed, `npm run format:check` passed, and `npm run build` passed. `astro check` reported 0 errors, 0 warnings, 0 hints. Astro 7.4.4 wrote 19 pages. Pagefind indexed 2 pages and 505 words. `/certifications` is one of those 19 pages, and it is only the redirect.
 6. `npm run preview` came up at http://127.0.0.1:4321/.
 7. A headless Chrome pass at viewport width 1280 opened these URLs. Each returned HTTP 200, set `data-theme` to the requested mode, and threw no page errors:
    - `/`
    - `/posts/prism-central-tip-use-the-view-by-dropdown-for-faster-vm-audits/`
-   - `/start-here/`
-   - `/certifications/`
-   - `/github-stats/`
-   - `/quest/`
+   - `/about/` (the certifications section was in the document)
    - `/search/`
 8. On `/search/`, the Pagefind box accepted `prism` and showed 2 results.
-9. Full-page screenshots for dark and light are under `/opt/cursor/artifacts/screenshot_*.png`.
+9. `/certifications/` followed its meta refresh to `/about#certifications`. The section was present and two EXAMPLE labels were visible.
+10. Full-page screenshots for this pass, dark and light, are `screenshot_brand_home_*.png`, `screenshot_brand_post_*.png`, `screenshot_brand_about_*.png`, and `screenshot_brand_search_*.png` under `/opt/cursor/artifacts/`.
 
 Not part of that smoke test: keyboard-only navigation, a screen reader, a phone viewport, `npm run dev` (preview was the production build), the WordPress importer, and a real GitHub Pages deploy.
 
@@ -201,7 +237,7 @@ The deploy workflow is safe for this branch only because its `on.push.branches` 
 - `updated` duplicates the publish timestamp. There is no evidence the posts were revised later.
 - `est_minutes`, `level`, `quest_id`, prerequisites, and objectives were filled in for the preview. They are not from the original frontmatter.
 - `/github-stats` does not fetch anything. A future build step could read public GitHub data for `nutanixguy` while `npm run build` runs. That step is not designed here, and no token should be added for it.
-- The certifications YAML is fiction. It is not a credential inventory.
+- The certifications YAML is fiction. It renders on `/about#certifications`. `/certifications` only redirects there. It is not a credential inventory.
 - `/quest` does not run a quest. The ids `aos-7-5-briefing` and `pc-view-by` are labels on the posts.
 - `scripts/import-wordpress.py` still targets `src/content/blog` and writes `pubDate` plus `categories`. Running it would not produce valid AstroPaper posts. Not run.
 - Search does not include the new pages. Add `data-pagefind-body` on those pages if they should be searchable.

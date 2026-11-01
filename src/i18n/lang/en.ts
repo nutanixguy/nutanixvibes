@@ -9,7 +9,6 @@ export default {
     archives: "Archives",
     search: "Search",
     startHere: "Start here",
-    certifications: "Certifications",
     githubStats: "GitHub stats",
     quest: "Quest",
   },

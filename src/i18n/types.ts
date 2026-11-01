@@ -7,7 +7,6 @@ export interface UIStrings {
     archives: string;
     search: string;
     startHere: string;
-    certifications: string;
     githubStats: string;
     quest: string;
   };

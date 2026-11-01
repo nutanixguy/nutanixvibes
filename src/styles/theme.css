@@ -12,26 +12,44 @@
 }
 
 /*
-  Dark is the default (:root), including when the theme script does not run.
-  Light values come after so they win on [data-theme="light"] at equal specificity.
+  Colors are Nutanix.com CSS custom properties, not invented values.
+  Source: the clientlib-site/theme.css stylesheet linked from
+  https://www.nutanix.com/ on 1 Nov 2026. The July 2026 partner brand PDF
+  names Charcoal Gray and white but does not publish hex codes.
+  Dark is the default (:root). Light values come after so they win on
+  [data-theme="light"] at equal specificity.
 */
 :root,
 [data-theme="dark"] {
-  --background: #07140e;
-  --foreground: #e8f7ef;
-  --accent: #3ddc97;
-  --accent-foreground: #04140e;
-  --muted: #12261c;
-  --muted-foreground: #a8c4b6;
-  --border: #1e4634;
+  /* --black, also --btn-neutral-background */
+  --background: #131313;
+  /* --btn-neutral-text and --btn-brand-text */
+  --foreground: #ffffff;
+  /* --btn-brand-text-dark-link. #7855fa is 3.96:1 on #131313, under AA. */
+  --accent: #a188fc;
+  /* #ffffff on #a188fc is 2.82:1. --black passes at 6.59:1. */
+  --accent-foreground: #131313;
+  /* --btn-neutral-background-hover */
+  --muted: #2a2a2a;
+  /* --btn-neutral-background-dark-pressed. --secondary-text #595959 is 2.65:1 here. */
+  --muted-foreground: #c7c7c7;
+  /* --btn-neutral-background-pressed */
+  --border: #474747;
 }
 
 [data-theme="light"] {
-  --background: #f4f7f4;
-  --foreground: #122018;
-  --accent: #085232;
+  /* --btn-neutral-background-dark */
+  --background: #ffffff;
+  /* --black */
+  --foreground: #131313;
+  /* --btn-brand-background and --btn-brand-text-link. 4.69:1 on #ffffff. */
+  --accent: #7855fa;
+  /* --btn-brand-text. 4.69:1 on #7855fa. */
   --accent-foreground: #ffffff;
-  --muted: #e3eee7;
-  --muted-foreground: #3d5246;
-  --border: #c5d6cb;
+  /* background:#f6f6f6 in the same stylesheet */
+  --muted: #f6f6f6;
+  /* --secondary-text. 7.00:1 on #ffffff, 6.48:1 on #f6f6f6. */
+  --muted-foreground: #595959;
+  /* --btn-neutral-background-dark-pressed */
+  --border: #c7c7c7;
 }
