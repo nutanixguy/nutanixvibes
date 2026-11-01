@@ -144,6 +144,10 @@ That file's `:root` block is the source. `src/styles/theme.css` names the same c
 
 `#7855fa` on `#131313` is 3.96:1, under AA for normal text, so dark mode uses the dark-link purple instead. `#595959` on `#131313` is 2.65:1, so dark secondary text does not use `--secondary-text`. No automated axe scan was run. These ratios are from a local WCAG calculation, not from Nutanix.
 
+### Quest id stays in the data and off the post
+
+`quest_id` is still an optional field in `src/content.config.ts`, and both posts still set it. `src/components/PostMeta.astro` no longer prints that value or a link to `/quest`. A post whose only session field is `quest_id` does not get a Session notes box. Estimated time, updated date, prerequisites, and objectives still render. `/quest` still lists the ids that are already on the posts. That page was not changed.
+
 ### Certifications live on About
 
 The standalone certifications page is gone from the nav. The same two YAML files still feed a section on the About page, `src/pages/about.astro`, at `/about#certifications`. `src/pages/certifications.astro` is a noindex meta refresh to that anchor. Chrome followed `http://127.0.0.1:4321/certifications/` to `http://127.0.0.1:4321/about#certifications` and the section was on the page. The sitemap filter in `astro.config.ts` drops `/certifications`. The cards are still labeled EXAMPLE.

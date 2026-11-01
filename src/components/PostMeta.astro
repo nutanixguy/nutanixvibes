@@ -1,7 +1,4 @@
 ---
-import { getRelativeLocaleUrl } from "astro:i18n";
-import config from "@/config";
-
 type Level = "beginner" | "intermediate" | "advanced";
 type Variant = "card" | "post";
 type Part = "badges" | "notes";
@@ -14,7 +11,6 @@ type Props = {
   prerequisites?: string[];
   objectives?: string[];
   est_minutes?: number;
-  quest_id?: string;
   updated?: Date;
 };
 
@@ -26,7 +22,6 @@ const {
   prerequisites = [],
   objectives = [],
   est_minutes,
-  quest_id,
   updated,
 } = Astro.props;
 
@@ -46,8 +41,6 @@ function levelLabel(value: Level): string {
 }
 
 const label = level ? levelLabel(level) : undefined;
-const locale = Astro.currentLocale ?? config.site.lang;
-const questHref = getRelativeLocaleUrl(locale, "quest");
 
 const updatedLabel = updated
   ? new Intl.DateTimeFormat("en", {
@@ -63,7 +56,6 @@ const showNotes =
   (prerequisites.length > 0 ||
     objectives.length > 0 ||
     est_minutes !== undefined ||
-    Boolean(quest_id) ||
     updated !== undefined);
 ---
 
@@ -112,21 +104,6 @@ const showNotes =
             <dt class="font-medium">Updated</dt>
             <dd>
               <time datetime={updated.toISOString()}>{updatedLabel}</time>
-            </dd>
-          </div>
-        )}
-        {quest_id && (
-          <div>
-            <dt class="font-medium">Quest id</dt>
-            <dd>
-              <code>{quest_id}</code>
-              {". "}
-              <a
-                href={questHref}
-                class="text-accent underline decoration-dashed underline-offset-4"
-              >
-                Quest page
-              </a>
             </dd>
           </div>
         )}
