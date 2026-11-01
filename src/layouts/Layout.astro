@@ -1,118 +1,125 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import SubscribeModal from '../components/SubscribeModal.astro';
-import { SITE_CONFIG, getAssetUrl } from '../config';
-import { ClientRouter } from 'astro:transitions';
+import { Font } from "astro:assets";
+import { ClientRouter } from "astro:transitions";
+import { resolveDefaultOgImagePath } from "@/utils/resolveDefaultOgImagePath";
+import { getAssetPath } from "@/utils/withBase";
+import config from "@/config";
+import "@/styles/global.css";
 
-// Import CSS stylesheets so Astro bundles them
-import '../styles/global.css';
-import '../styles/screen.css';
-
-interface Props {
+type Props = {
   title?: string;
   description?: string;
-  image?: string | null;
-  type?: 'website' | 'article';
-  articleDate?: string | Date;
-  tags?: string[];
-  author?: string;
-  current?: string;
-}
+  ogImage?: string;
+  canonicalURL?: string;
+};
+
+const { site } = config;
 
 const {
-  title,
-  description,
-  image,
-  type = 'website',
-  articleDate,
-  tags = [],
-  author,
-  current,
+  title = site.title,
+  description = site.description,
+  ogImage = resolveDefaultOgImagePath(config),
+  canonicalURL = new URL(Astro.url.pathname, Astro.site).href,
 } = Astro.props;
 
-const currentYear = new Date().getFullYear();
-const bodyClass = current === 'home' ? 'home-template' : `${current || 'page'}-template`;
+const socialImageURL = new URL(ogImage, Astro.site ?? Astro.url);
+const rssHref = getAssetPath("rss.xml");
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <BaseHead
-      title={title}
-      description={description}
-      image={image}
-      type={type}
-      articleDate={articleDate}
-      tags={tags}
-      author={author}
+<!doctype html>
+<html
+  dir={site.dir ?? "ltr"}
+  lang={Astro.currentLocale ?? site.lang}
+  data-theme="dark"
+  class="dark overflow-y-scroll scroll-smooth"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href={getAssetPath("favicon.svg")} />
+    <link rel="icon" href={getAssetPath("favicon.ico")} />
+    <link rel="canonical" href={canonicalURL} />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Font -->
+    <Font
+      cssVariable="--font-google-sans-code"
+      preload={[{ subset: "latin", weight: 400, style: "normal" }]}
     />
+    <Font
+      cssVariable="--font-jetbrains-mono"
+      preload={[{ subset: "latin", weight: 500, style: "normal" }]}
+    />
+
+    <!-- Primary meta -->
+    <title>{title}</title>
+    <meta name="title" content={title} />
+    <meta name="description" content={description} />
+    <meta name="author" content={site.author} />
+    <link rel="sitemap" href={getAssetPath("sitemap-index.xml")} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.title} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={socialImageURL} />
+
+    <!-- Twitter / X -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={socialImageURL} />
+
+    <!-- RSS autodiscovery -->
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={site.title}
+      href={new URL(rssHref, Astro.site)}
+    />
+
+    <!-- Filled at runtime by theme.ts to match the current background colour -->
+    <meta name="theme-color" content="" />
+
+    <!-- Extra head content injected by child layouts (e.g. JSON-LD, article meta) -->
+    <slot name="head" />
+
+    {
+      site.googleVerification && (
+        <meta
+          name="google-site-verification"
+          content={site.googleVerification}
+        />
+      )
+    }
+
+    <!--
+      Inline FOUC-prevention script: sets data-theme on <html> before
+      the browser paints. Runs synchronously, no defer/async.
+    -->
     <script is:inline>
-        // Theme toggle script to prevent FOUC
-        (function() {
-            var currentTheme = localStorage.getItem('theme');
-            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            if (currentTheme === 'dark' || (!currentTheme && prefersDark)) {
-                document.documentElement.classList.add('dark-mode');
-                document.documentElement.classList.remove('light-mode');
-            } else {
-                document.documentElement.classList.add('light-mode');
-                document.documentElement.classList.remove('dark-mode');
-            }
-        })();
-
-        // Re-run theme check on page transitions
-        document.addEventListener('astro:after-swap', function() {
-            var currentTheme = localStorage.getItem('theme');
-            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            if (currentTheme === 'dark' || (!currentTheme && prefersDark)) {
-                document.documentElement.classList.add('dark-mode');
-                document.documentElement.classList.remove('light-mode');
-            } else {
-                document.documentElement.classList.add('light-mode');
-                document.documentElement.classList.remove('dark-mode');
-            }
-        });
+      (function () {
+        const stored = localStorage.getItem("theme");
+        const theme = stored === "light" || stored === "dark" ? stored : "dark";
+        const root = document.documentElement;
+        root.setAttribute("data-theme", theme);
+        root.classList.toggle("dark", theme === "dark");
+        // Expose value so theme.ts can skip re-detection.
+        window.__theme = { value: theme };
+      })();
     </script>
+
     <ClientRouter />
-</head>
-<body class={bodyClass}>
-    <div class="site-wrapper">
-        <!-- Main Content Slot -->
-        <slot />
-
-        <!-- Footer -->
-        <footer class="site-footer outer">
-            <div class="site-footer-content inner">
-                <section class="copyright">
-                    <a href={getAssetUrl('/')}>{SITE_CONFIG.title}</a> &copy; {currentYear}
-                </section>
-                <section class="poweredby">
-                    Infrastructure notes by Jamie Terrell
-                </section>
-                <nav class="site-footer-nav">
-                    <a href={getAssetUrl('/')}>Latest Posts</a>
-                    <a href={getAssetUrl('/about/')}>About Me</a>
-                    <a href={getAssetUrl('/feed.xml')}>RSS</a>
-                    {SITE_CONFIG.xUsername ? (
-                        <a href={`https://x.com/${SITE_CONFIG.xUsername}`} target="_blank" rel="noopener">X</a>
-                    ) : SITE_CONFIG.twitter && (
-                        <a href={`https://twitter.com/${SITE_CONFIG.twitter}`} target="_blank" rel="noopener">Twitter</a>
-                    )}
-                    {SITE_CONFIG.linkedin && (
-                        <a href={SITE_CONFIG.linkedin} target="_blank" rel="noopener">LinkedIn</a>
-                    )}
-                    {SITE_CONFIG.github && (
-                        <a href={`https://github.com/${SITE_CONFIG.github}`} target="_blank" rel="noopener">GitHub</a>
-                    )}
-                    {SITE_CONFIG.email && (
-                        <a href={`mailto:${SITE_CONFIG.email}`}>Email</a>
-                    )}
-                </nav>
-            </div>
-        </footer>
-    </div>
-
-    <!-- Subscribe Modal overlay -->
-    {SITE_CONFIG.subscribers && <SubscribeModal />}
-</body>
+  </head>
+  <body
+    class="bg-background font-app text-foreground selection:bg-accent/75 selection:text-accent-foreground flex min-h-svh flex-col"
+  >
+    <slot />
+    <script>
+      import "@/scripts/theme";
+    </script>
+  </body>
 </html>

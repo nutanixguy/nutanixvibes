@@ -1,15 +1,26 @@
 ---
 title: "Nutanix 7.5 Just Dropped – Here's What Actually Matters"
 description: "So Nutanix pushed out AOS 7.5, AHV 11, and Prism Central 7.5 back in December, and honestly? There's some good stuff in here."
-cover: assets/images/nutanix-7-5-hero.png
-date: 2026-01-30
-tags: [Nutanix, "Prism Central", AHV, CVM, NGT]
-class: post-template
-subclass: post
-author: jamie
-current: post
-navigation: true
-disqus: false
+ogImage: /assets/images/nutanix-7-5-hero.png
+pubDatetime: 2026-01-30T12:00:00.000Z
+updated: 2026-01-30T12:00:00.000Z
+author: Jamie Terrell
+tags:
+  - Nutanix
+  - Prism Central
+  - AHV
+  - CVM
+  - NGT
+level: intermediate
+topic: Nutanix 7.5
+prerequisites:
+  - You already run AOS and Prism Central
+  - You can read a release note without a cluster open in front of you
+objectives:
+  - Pick the AOS 7.5, AHV 11, and Prism Central 7.5 changes worth an upgrade plan
+  - Note that disabling CVM and AHV SSH breaks cross-cluster and DR live migration
+est_minutes: 5
+quest_id: aos-7-5-briefing
 ---
 
 So Nutanix pushed out AOS 7.5, AHV 11, and Prism Central 7.5 back in December, and honestly? There's some good stuff in here. Like, actually useful stuff—not just marketing fluff.

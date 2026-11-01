@@ -1,0 +1,49 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Breadcrumb from "@/components/Breadcrumb.astro";
+import Main from "@/components/Main.astro";
+import Footer from "@/components/Footer.astro";
+import config from "@/config";
+
+const reserved = (await getCollection("posts"))
+  .flatMap(post => {
+    const questId = post.data.quest_id;
+    return questId ? [{ questId, title: post.data.title }] : [];
+  })
+  .sort((a, b) => a.questId.localeCompare(b.questId));
+---
+
+<Layout
+  title={`Quest | ${config.site.title}`}
+  description="The quest route is reserved. Nothing runs here yet."
+>
+  <Header />
+  <Breadcrumb />
+  <Main pageTitle="Quest" pageDesc="Coming soon.">
+    <div class="max-w-app space-y-4">
+      <p>
+        This URL is reserved for a guided path through the posts. There is no
+        quest player, no progress tracking, and no scoring.
+      </p>
+      <p>
+        Posts can already store a <code>quest_id</code>. The ids below are
+        labels on the current posts. Opening this page does not start them.
+      </p>
+      {
+        reserved.length > 0 && (
+          <ul class="list-disc space-y-2 ps-5">
+            {reserved.map(item => (
+              <li>
+                <code>{item.questId}</code>
+                <span> — {item.title}</span>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+  </Main>
+  <Footer />
+</Layout>

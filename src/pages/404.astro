@@ -1,62 +1,35 @@
 ---
-import { getCollection } from 'astro:content';
-import BaseHead from '../components/BaseHead.astro';
-import PostCard from '../components/PostCard.astro';
-import { SITE_CONFIG, getAssetUrl } from '../config';
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import LinkButton from "@/components/LinkButton.astro";
+import { getRelativeLocaleUrl } from "astro:i18n";
+import { useTranslations } from "@/i18n";
+import config from "@/config";
 
-// Import CSS stylesheets so Astro bundles them
-import '../styles/global.css';
-import '../styles/screen.css';
-
-// Fetch the 3 latest posts for error recommendations
-const allPosts = await getCollection('posts');
-allPosts.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
-const recommendedPosts = allPosts.slice(0, 3);
+const locale = Astro.currentLocale ?? config.site.lang;
+const t = useTranslations(locale);
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <BaseHead title="404 - Page Not Found" description="Page not found" />
-</head>
-<body class="error-template">
-    <div class="site-wrapper">
-        <!-- Error Header -->
-        <header class="site-header outer no-cover">
-            <div class="inner">
-                <nav class="site-nav-center">
-                    {SITE_CONFIG.logo ? (
-                        <a class="site-nav-logo" href={getAssetUrl('/')}>
-                            <img src={getAssetUrl(SITE_CONFIG.logo)} alt={SITE_CONFIG.title} />
-                        </a>
-                    ) : (
-                        <a class="site-nav-logo" href={getAssetUrl('/')}>{SITE_CONFIG.title}</a>
-                    )}
-                </nav>
-            </div>
-        </header>
+<Layout title={`${t.notFound.title} | ${config.site.title}`}>
+  <Header />
 
-        <!-- Error Content -->
-        <main id="site-main" class="site-main outer" role="main">
-            <div class="inner">
-                <section class="error-message">
-                    <h1 class="error-code">404</h1>
-                    <p class="error-description">Page not found</p>
-                    <a class="error-link" href={getAssetUrl('/')}>Go to the front page &rarr;</a>
-                </section>
-            </div>
-        </main>
-
-        <!-- Recommended Posts Feed -->
-        <aside class="outer">
-            <div class="inner">
-                <div class="post-feed">
-                    {recommendedPosts.map(post => (
-                        <PostCard post={post} />
-                    ))}
-                </div>
-            </div>
-        </aside>
+  <main
+    id="main-content"
+    class="app-layout my-1 flex flex-1 items-center justify-center"
+  >
+    <div class="mb-14 flex flex-col items-center justify-center">
+      <h1 class="text-accent text-9xl font-bold">404</h1>
+      <span aria-hidden="true"> ¯\_(ツ)_/¯ </span>
+      <p class="mt-4 text-2xl sm:text-3xl">{t.notFound.message}</p>
+      <LinkButton
+        href={getRelativeLocaleUrl(locale, "")}
+        class="my-6 text-lg underline decoration-dashed underline-offset-8"
+      >
+        {t.notFound.goHome}
+      </LinkButton>
     </div>
-</body>
-</html>
+  </main>
+
+  <Footer />
+</Layout>

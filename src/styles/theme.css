@@ -1,0 +1,37 @@
+/* Register design tokens for Tailwind v4 */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --font-app: var(--font-google-sans-code);
+  --font-accent: var(--font-jetbrains-mono);
+}
+
+/*
+  Dark is the default (:root), including when the theme script does not run.
+  Light values come after so they win on [data-theme="light"] at equal specificity.
+*/
+:root,
+[data-theme="dark"] {
+  --background: #07140e;
+  --foreground: #e8f7ef;
+  --accent: #3ddc97;
+  --accent-foreground: #04140e;
+  --muted: #12261c;
+  --muted-foreground: #a8c4b6;
+  --border: #1e4634;
+}
+
+[data-theme="light"] {
+  --background: #f4f7f4;
+  --foreground: #122018;
+  --accent: #085232;
+  --accent-foreground: #ffffff;
+  --muted: #e3eee7;
+  --muted-foreground: #3d5246;
+  --border: #c5d6cb;
+}
