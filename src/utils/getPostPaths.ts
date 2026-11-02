@@ -55,6 +55,7 @@ const RESERVED_ROOT_SEGMENTS = new Set([
   "posts",
   "quest",
   "robots.txt",
+  "roll-call",
   "rss.xml",
   "search",
   "start-here",

@@ -9,6 +9,7 @@ export default {
     archives: "Archives",
     search: "Search",
     startHere: "Start here",
+    rollCall: "Roll Call",
   },
   post: {
     publishedAt: "Published at",

@@ -1,6 +1,6 @@
 import { defineCollection } from "astro:content";
 import { z } from "astro/zod";
-import { glob } from "astro/loaders";
+import { file, glob } from "astro/loaders";
 import config from "@/config";
 
 export const BLOG_PATH = "src/content/posts";
@@ -74,4 +74,48 @@ const certifications = defineCollection({
   }),
 });
 
-export const collections = { posts, pages, certifications };
+// Query keys that identify a campaign click rather than the page itself.
+const trackingParams = new Set([
+  "fbclid",
+  "gclid",
+  "igshid",
+  "mc_cid",
+  "mc_eid",
+  "utm_campaign",
+  "utm_content",
+  "utm_id",
+  "utm_medium",
+  "utm_source",
+  "utm_term",
+]);
+
+function httpsWithoutTracking(value: string): boolean {
+  const parsed = new URL(value);
+  if (parsed.protocol !== "https:") return false;
+  for (const key of parsed.searchParams.keys()) {
+    if (trackingParams.has(key.toLowerCase())) return false;
+  }
+  return true;
+}
+
+const rollCall = defineCollection({
+  loader: file("src/data/roll-call.yaml"),
+  schema: z.object({
+    name: z.string().trim().min(1),
+    url: z.url().refine(httpsWithoutTracking, {
+      message: "Use an https URL with no tracking parameters",
+    }),
+    author: z.string().trim().min(1).optional(),
+    // Two letters, not an ISO check. TW is the code this page uses for Traditional Chinese.
+    language: z.string().regex(/^[A-Z]{2}$/),
+    focus: z
+      .string()
+      .trim()
+      .min(1)
+      .refine(value => !/[\r\n]/.test(value), {
+        message: "Focus is one line",
+      }),
+  }),
+});
+
+export const collections = { posts, pages, certifications, rollCall };

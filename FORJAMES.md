@@ -6,6 +6,8 @@ Audience: Jamie. You know Nutanix, Citrix, Azure, and PowerShell. This file is t
 
 This branch is a throwaway rebuild of Nutanix Vibes on the AstroPaper theme. It is not the live site.
 
+`/roll-call/` is a list of peer Nutanix blogs. The entries are `src/data/roll-call.yaml`. The schema is the `rollCall` collection in `src/content.config.ts`. Adding a peer is one more item in that file.
+
 The live site is still the Casper theme on `main`. Publishing is `.github/workflows/deploy.yml`. That file was not edited. Its hash on this branch matches `main`. `public/CNAME` still contains `nutanixvibes.com` and was not edited.
 
 AstroPaper is the MIT-licensed theme at https://github.com/satnaing/astro-paper. The license text is `LICENSE` (Copyright (c) 2023 Sat Naing).
@@ -22,6 +24,7 @@ flowchart TD
     posts["src/content/posts/*.md"]
     about["src/content/pages/about.md"]
     certs["src/content/certifications/*.yaml"]
+    roll["src/data/roll-call.yaml"]
     siteConfig["astro-paper.config.ts"]
     imageMasters["src/assets/images/*.webp"]
     publicFiles["public/ including og.jpg"]
@@ -50,6 +53,8 @@ flowchart TD
 
 The certification YAML is not its own page. `src/pages/about.astro` renders it at `/about#certifications`. `src/pages/certifications.astro` is a meta refresh to that anchor.
 
+The roll call YAML is its own page. `src/pages/roll-call.astro` loads the `rollCall` collection and `astro build` writes `dist/roll-call/index.html`. The 2 Nov 2026 build included that URL in `dist/sitemap-0.xml` as `https://nutanixvibes.com/roll-call/`.
+
 The home hero, Jamie's logo, and the two post covers are WebP files in `src/assets/images/`. `astro build` runs them through Astro's Sharp image service and writes the sized files under `dist/_astro/`. `public/og.jpg` is still copied as-is. It is the site-wide fallback OG image (`astro-paper.config.ts` `site.ogImage`, resolved by `src/utils/resolveDefaultOgImagePath.ts`).
 
 ## 3. Codebase map
@@ -60,7 +65,7 @@ The home hero, Jamie's logo, and the two post covers are WebP files in `src/asse
 | `astro-paper.config.ts` | Site name, URL, author, timezone, social links, Pagefind on, edit-post link off. This is the file you edit for site settings. |
 | `astro.config.ts` | Astro itself: Markdown plugins, sitemap, Tailwind, Google Sans Code, JetBrains Mono. |
 | `src/config.ts` | Applies defaults on top of `astro-paper.config.ts`. Do not put content here. |
-| `src/content.config.ts` | Schema for posts, pages, and the certifications collection. Same role as a validated object schema in a Desired State config. |
+| `src/content.config.ts` | Schema for posts, pages, the certifications collection, and the roll call collection. Same role as a validated object schema in a Desired State config. |
 | `src/content/posts/` | The two migrated posts. |
 | `src/content/pages/about.md` | About page prose. Same text as the old `src/data/about.md` on `main`. |
 | `src/pages/about.astro` | Renders that prose, then the certifications section at `#certifications`. Jamie's logo is the profile image under the heading. |
@@ -68,7 +73,10 @@ The home hero, Jamie's logo, and the two post covers are WebP files in `src/asse
 | `src/pages/certifications.astro` | Static redirect to `/about#certifications`. Not a content page. |
 | `src/pages/[...slug]/` | One post page per file in `src/content/posts/`, served at `/{slug}/`. |
 | `src/pages/` | Other routes. A file here becomes a URL. The posts list stays at `/posts/`. `/github-stats` and `/quest` are not published. |
-| `src/components/Header.astro` | Nav. Start here is in this list. Certifications, GitHub stats, and Quest are not. |
+| `src/components/Header.astro` | Nav. Start here and Roll Call are in this list. Certifications, GitHub stats, and Quest are not. |
+| `src/data/roll-call.yaml` | The peer blogs. One list item per blog. `id` is the sort order and is not shown. |
+| `src/pages/roll-call.astro` | The `/roll-call/` page. |
+| `src/components/RollCallCard.astro` | One card: name, optional author, language, focus, external link. |
 | `src/components/Card.astro` | Post card on the home page, the posts list, and Start here. |
 | `src/components/PostMeta.astro` | Level and topic badges, plus the "Before you start" block on a post. |
 | `src/layouts/Layout.astro` | HTML shell, fonts, and the script that sets dark mode before the first paint. |
@@ -101,6 +109,8 @@ Old Casper files are gone on this branch, including `src/components/AlgoliaSearc
 Fonts: Google Sans Code is the body font (the theme default). JetBrains Mono is the accent font for the site title, nav, headings, and badges (`--font-accent` in `src/styles/theme.css`, loaded in `src/layouts/Layout.astro`). The build log copied 28 font files. Those files are downloaded at build time by Astro's Google font provider. An offline build was not tested.
 
 There is no app server, no database, and no client-side content API.
+
+The roll call did not add a package. It uses the `file` loader that already ships with Astro (`astro/loaders`). `npm ci` on 2 Nov 2026 still installed 578 packages.
 
 Sharp (`sharp` `^0.35.5` in `package.json`) was already a dependency. Astro's image service uses it. This image change did not add a package.
 
@@ -254,6 +264,60 @@ The old files `public/assets/images/nutanix-7-5-hero.png` and `public/assets/ima
 
 I rejected leaving the PNGs in `public/` and serving them unchanged. That matches the old cover path, and it skips the resize step. I also rejected committing the original PNGs (about 4.6MB together) and letting Astro be the only encoder. Quality-90 WebP masters are the sources in git. The pipeline still does the responsive sizes.
 
+### Roll call (2 Nov 2026)
+
+Jamie's list had 13 URLs. I requested each one from this environment on 2 Nov 2026. None of them was dropped.
+
+These returned HTTP 200 to Python's urllib:
+
+- `https://mikedent.io/`
+- `https://tomomartin.hateblo.jp/`
+- `https://en.vmik.net/`
+- `https://nutanixcalm.wordpress.com/`
+- `https://juliendumur.fr/en/` and `https://juliendumur.fr/`
+- `https://www.weithenn.org/2026/02/numa-architecture-nutanix.html` and `https://www.weithenn.org/`
+- `https://justaserverengineer.blogspot.com/2026/02/top-10-and-bit-nutanix-command.html` and `https://justaserverengineer.blogspot.com/`
+- `https://itskimpossible.blog/`
+- `https://blog.donders.it/`
+- `https://jonashogman.com/`
+- `https://blog.ntnx.jp/`
+- `https://sl-notes.dev/`
+
+`https://medium.com/@gvenin/how-to-upgrade-nutanix-kubernetes-platform-nkp-3c89adb740de` returned HTTP 403 to that same urllib client. A second fetch returned the article "How to upgrade Nutanix Kubernetes Platform (NKP) ?" with the byline Gael V. The profile `https://medium.com/@gvenin` lists that post and other Nutanix posts (NDK, disaster recovery, Packer, HCI monitoring). The card links to the profile. Weithenn and Just A Server Engineer were the same kind of pointer: the list URL was one post, and the card links to the blog home. Those post URLs were live too.
+
+`author` is set only where the site stated a name.
+
+| Blog | Author stored | Where the site stated it |
+| --- | --- | --- |
+| Thoughts and Ramblings by Mike | Mike Dent | Heading and sidebar on `https://mikedent.io/about/` |
+| Gael V | Gael V | Medium byline and profile name. The card title is the same string, so `src/components/RollCallCard.astro` does not print it twice. |
+| en.vmik.net | vmik | Post byline with `rel="author"`. The author archive is titled vmik. That page did not give a fuller name. |
+| Nutanix Self-Service (calm) | Avi Coren | Signed `https://nutanixcalm.wordpress.com/about/`. The copyright line on that page is "2026 © Avi Coren". |
+| Julien Dumur | Julien Dumur | "My name is Julien Dumur" on `https://juliendumur.fr/en/about/`. Same display rule as Gael V. |
+| 不自量力 の Weithenn | Wei-Ren Wang | `https://www.weithenn.org/2002/11/about-weithenn.html` is the owner page. Inside the yearly review it links "Microsoft MVP Profile - Wei-Ren Wang" and "VMware vExpert Information - Wei-Ren Wang". The byline on that page is "by Weithenn". |
+| Itskimpossible! | Kim Mount | "My name is Kim Mount" on `https://itskimpossible.blog/about-me/` |
+| Donders.IT | Bart Donders | "My name is Bart Donders" on `https://blog.donders.it/about/` |
+| Jonas Blog | Jonas Högman | "My name is Jonas Högman" on `https://jonashogman.com/about/` |
+| Sam's Tech Notes | Sam Larson | Home page heading, and "About the Author" on `https://sl-notes.dev/` |
+
+Left blank on purpose:
+
+- NutaNice Xperience. `https://tomomartin.hateblo.jp/about` shows Hatena id `tomomartin` and "Pre-sales Engineer Tokyo JAPAN". No personal name.
+- NTNX＞日記. `https://blog.ntnx.jp/about` shows Hatena id `gowatana`. The copyright line is "©2026 gowatana". I did not treat the account id as a name.
+- Just A Server Engineer. The blog calls the author "Just A Server Engineer" and does not give a personal name.
+
+Julien's entry keeps `https://juliendumur.fr/en/`, which is the URL in the list, and `language: EN`. The French root is also live. Its `<html lang>` was `fr-FR` and the title calls it a French reference blog. The focus line says the English pages are translations.
+
+The language field is two capital letters, not an ISO check (`src/content.config.ts`). TW would fail an ISO language check. The two Japanese blogs send `lang="ja"`, so those entries use JP. Weithenn's pages did not set `html lang`. The visible text is Traditional Chinese, so that entry uses TW.
+
+The loader is Astro's `file()` on one YAML file. `node_modules/astro/dist/content/loaders/file.js` skips an array item that has no `id` or `slug`. `id` is the sort key on the page. It is not in the schema, so it is not rendered. I did not use one file per blog, which is how `src/content/certifications/` works, because the request was one entry in a file such as `src/data/roll-call.yaml`.
+
+`roll-call` is in `RESERVED_ROOT_SEGMENTS` in `src/utils/getPostPaths.ts`, so a future post file cannot replace this page. The nav string is `nav.rollCall` in `src/i18n/lang/en.ts` and `src/i18n/types.ts`. The breadcrumb label is in `src/components/Breadcrumb.astro`.
+
+Each blog link is `target="_blank"` and `rel="noopener noreferrer"`. The schema rejects an `http` URL and a fixed list of tracking query keys (`utm_*`, `fbclid`, `gclid`, `mc_cid`, `mc_eid`, `igshid`). The page does not add a script tag. Pagefind still indexes 2 pages, because `/roll-call/` does not set `data-pagefind-body`.
+
+Cards use the existing tokens in `src/styles/theme.css`: `bg-muted`, `border-border`, `text-accent`, `text-muted-foreground`. In Chrome on the preview, a dark card computed to `rgb(42, 42, 42)` (`#2a2a2a`), the link to `rgb(161, 136, 252)` (`#a188fc`), and the page background to `rgb(19, 19, 19)`. Light was `rgb(246, 246, 246)` (`#f6f6f6`), `rgb(120, 85, 250)` (`#7855fa`), and `rgb(255, 255, 255)`. At 1280px the grid was 2 columns. At 390px it was 1 column. Neither viewport had horizontal overflow.
+
 ## 6. How to run and test
 
 From the repo root, on Node 22.23.4 or newer:
@@ -315,6 +379,25 @@ Screenshots from this pass are under `/opt/cursor/artifacts/`: `screenshot_home_
 
 Not part of this pass: keyboard-only navigation, a screen reader, an axe scan, a physical phone, LinkedIn or X's share debugger, and a GitHub Pages deploy.
 
+### Smoke test for Roll Call (2 Nov 2026)
+
+Same machine, Node `v22.23.4`. `npm ci` in this session installed 578 packages.
+
+1. `npm run format:check` passed.
+2. `npm run lint` passed (exit 0, no findings).
+3. `npm run build` passed. `astro check` reported 0 errors, 0 warnings, 0 hints. Astro 7.4.4 wrote 18 pages. The new one is `/roll-call/index.html`. Pagefind still indexed 2 pages and 520 words.
+4. `npm run preview` served `http://127.0.0.1:4321/`.
+5. Headless Chrome opened `/`, clicked Roll Call, and landed on `/roll-call/` with `data-theme="dark"`. The document had one `h1`, "Roll Call", and 13 external links. Each had `target="_blank"` and `rel="noopener noreferrer"`. No `utm_` string was in those hrefs.
+6. Clicking `#theme-btn` set `data-theme="light"`.
+7. At 1280px the cards were 2 columns. At 390px they were 1 column. `scrollWidth` was not wider than the viewport in either case.
+8. At 390px the menu button set `aria-expanded="true"` and the Roll Call item was visible.
+9. These preview URLs stayed on their existing paths: `/`, `/about/`, `/posts/`, `/start-here/`, `/search/`, `/archives/`, `/tags/`, both post slugs. `/certifications/` still refreshed to `/about#certifications`.
+10. Screenshots are `screenshot_roll_call_dark.png`, `screenshot_roll_call_light.png`, and `screenshot_roll_call_mobile.png` under `/opt/cursor/artifacts/`. The mobile shot is the light theme at 390px.
+
+A console error during that pass was `favicon.ico` 404. `src/layouts/Layout.astro` links `favicon.ico`. `public/` only has `favicon.svg`. That 404 is not from this page. I did not add an ico file.
+
+Not part of this pass: a screen reader, an axe scan, a physical phone, and a GitHub Pages deploy. Search was not expected to return this page.
+
 ## 7. Lessons learned
 
 The post template only drew a cover when `ogImage` was a root-relative string (`src/pages/[...slug]/index.astro`, the `coverSrc` check). A relative path still becomes image metadata, and the old code already copied `.src` into the `og:image` meta tag. If I had only edited the frontmatter, the share image would have changed and the page would have shown no picture. The template now renders metadata with `<Image>` and keeps the string branch for a file in `public/`.
@@ -332,6 +415,10 @@ Pagefind's default UI only indexes HTML marked `data-pagefind-body`. That is why
 The deploy workflow is safe for this branch only because its `on.push.branches` list is `[main]` and it also allows `workflow_dispatch`. A branch name does not protect you if someone later adds `pull_request` or `**` to that trigger. Read the file before the next push.
 
 I compared `.github/workflows/deploy.yml` with this branch and did not edit it. `actions/setup-node@v4` with `node-version: 22` installs the newest Node 22 in the `actions/node-versions` manifest. On 2 Nov 2026 that newest release is `22.23.4`, the same value as `.nvmrc`. It satisfies `package.json` `engines.node` (`>=22.23.4`) and the installed `astro` package engines (`node >=22.23.4`, `npm >=9.6.5`). Node 22.23.4 includes npm 10.9.9. The workflow runs `npm ci` and then `npm run build`, which is the script in `package.json`: `astro check && astro build && pagefind --site dist && node copy-pagefind.mjs`. The upload path is `dist`. That is the same package manager, the same build command, and a Node version this branch accepts. `SITE_URL` is set in the workflow and is not read. The site URL comes from `astro-paper.config.ts` and is already `https://nutanixvibes.com`. No change to `deploy.yml` is required for this branch to build. I did not run the GitHub Actions workflow itself.
+
+The first full-page screenshot of `/roll-call/` showed the home hero underneath the cards. I had clicked Roll Call from `/` and captured the page while Astro's client router still had the outgoing view. After a short wait the DOM had one `h1` and no images. A direct load of `/roll-call/` was clean in dark and light. The page code did not change for this. The next screenshot after a client navigation needs to wait until the old view is gone, or the URL should be loaded directly.
+
+Medium returned HTTP 403 to Python's urllib and the article was still up when fetched another way. One client status was not enough to call the blog dead. I kept the entry after the second fetch showed the NKP article and the rest of the profile.
 
 ## 8. Open questions and known gaps
 
@@ -351,3 +438,10 @@ I compared `.github/workflows/deploy.yml` with this branch and did not edit it. 
 - `features.dynamicOgImage` is still on. Posts that set `ogImage` skip the generated PNG (`src/pages/[...slug]/index.png.ts`). `/og.png` is still generated for the site fallback. A post with no `ogImage` was not tested.
 - Font download needs network at build time. An offline build was not tested.
 - Upstream AstroPaper CI (pnpm, Node 24) was not added. This branch has no PR lint workflow of its own. Lint was run locally.
+- `/roll-call/` is not in the Pagefind index. It does not set `data-pagefind-body`. A search for one of these blog names was not run.
+- Three cards link to the blog home, not the article URL in the source list: Gael V (`https://medium.com/@gvenin`), Weithenn (`https://www.weithenn.org/`), and Just A Server Engineer (`https://justaserverengineer.blogspot.com/`). The article URLs were live. Change the `url` field if the card should open the post instead.
+- Julien's badge is EN because the card opens `/en/`. The French root is the original. I did not set `language: FR`.
+- NutaNice, NTNX＞日記, and Just A Server Engineer have no `author`. The sites did not state a personal name. vmik and Gael V are stored as the sites wrote them.
+- Wei-Ren Wang comes from the MVP and vExpert link text on the owner page, not from a sentence that says "my name is".
+- The roll call was checked at 390px and 1280px in headless Chrome. That is not a physical phone. No axe scan and no screen reader pass on this page.
+- `public/favicon.ico` is still missing. `src/layouts/Layout.astro` requests it, and the preview logged a 404. I did not add the file.
