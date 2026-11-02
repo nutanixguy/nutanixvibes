@@ -7,8 +7,6 @@ export interface UIStrings {
     archives: string;
     search: string;
     startHere: string;
-    githubStats: string;
-    quest: string;
   };
   post: {
     publishedAt: string;

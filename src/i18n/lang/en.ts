@@ -9,8 +9,6 @@ export default {
     archives: "Archives",
     search: "Search",
     startHere: "Start here",
-    githubStats: "GitHub stats",
-    quest: "Quest",
   },
   post: {
     publishedAt: "Published at",

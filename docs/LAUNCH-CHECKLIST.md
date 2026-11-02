@@ -33,7 +33,7 @@ Run it in three passes: before the merge to `main`, at the deploy, and in the fi
 - [ ] Home, one post, About, and search in dark mode and in light mode. Dark is the default (`src/layouts/Layout.astro`).
 - [ ] The same four pages on a phone-width browser. Desktop screenshots at 1280 were taken for this preview. A phone pass was not.
 - [ ] Read `/about#certifications` and confirm the curated Nutanix and Citrix list is what should be public. The entries are YAML in `src/content/certifications/`, taken from LinkedIn on 1 Nov 2026. Expiry dates are not shown.
-- [ ] Decide what `/github-stats` should do. The page is a placeholder: every value is "Not fetched", and the nav still links to it. Either remove that nav link or keep the honest placeholder. Do not type in numbers by hand.
+- [x] `/github-stats` is not published, and the nav does not link to it. Do not type GitHub numbers in by hand.
 
 ### SEO and social images
 

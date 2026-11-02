@@ -64,8 +64,8 @@ The certification YAML is not its own page. `src/pages/about.astro` renders it a
 | `src/content/certifications/` | Curated Nutanix and Citrix credentials from Jamie's LinkedIn, read 1 Nov 2026. No expiry dates. |
 | `src/pages/certifications.astro` | Static redirect to `/about#certifications`. Not a content page. |
 | `src/pages/[...slug]/` | One post page per file in `src/content/posts/`, served at `/{slug}/`. |
-| `src/pages/` | Other routes. A file here becomes a URL. `src/pages/quest.astro` is `/quest`. The posts list stays at `/posts/`. |
-| `src/components/Header.astro` | Nav. Start here and GitHub stats are in this list. Certifications and Quest are not. |
+| `src/pages/` | Other routes. A file here becomes a URL. The posts list stays at `/posts/`. `/github-stats` and `/quest` are not published. |
+| `src/components/Header.astro` | Nav. Start here is in this list. Certifications, GitHub stats, and Quest are not. |
 | `src/components/Card.astro` | Post card on the home page, the posts list, and Start here. |
 | `src/components/PostMeta.astro` | Level and topic badges, plus the "Before you start" block on a post. |
 | `src/layouts/Layout.astro` | HTML shell, fonts, and the script that sets dark mode before the first paint. |
@@ -109,7 +109,7 @@ AstroPaper already has the fields the migration asked for (`pubDatetime`, `ogIma
 
 On `main`, `src/components/AlgoliaSearch.astro` loaded Algolia from a CDN when `SITE_CONFIG.algolia` was set. `src/config.ts` on `main` had no `algolia` block and no keys. No `.env` file is in the repo. Tracked source on this branch has no Algolia strings. GitHub Actions secrets were not inspected.
 
-`astro-paper.config.ts` sets `features.search` to `"pagefind"`. `npm run build` runs `pagefind --site dist`. Only posts carry `data-pagefind-body` (`src/pages/[...slug]/index.astro`), so the placeholder pages are not in the index. A search for `prism` on the preview returned both posts at `/{slug}/`. That was checked in the browser.
+`astro-paper.config.ts` sets `features.search` to `"pagefind"`. `npm run build` runs `pagefind --site dist`. Only posts carry `data-pagefind-body` (`src/pages/[...slug]/index.astro`), so the other pages are not in the index. A search for `prism` on the preview returned both posts at `/{slug}/`. That was checked in the browser.
 
 ### Astro 7
 
@@ -155,7 +155,7 @@ I built `main` at commit `6c3e966` and listed every HTML and XML file under `dis
 
 Those paths are the post pages again. `getPostUrl` in `src/utils/getPostPaths.ts` no longer prefixes `posts/`. Cards, the RSS items in `src/pages/rss.xml.ts`, canonical and `og:url`, and Pagefind all use that helper or the built file path. A search for `prism` returned `/prism-central-tip-use-the-view-by-dropdown-for-faster-vm-audits/` and `/nutanix-7-5-just-dropped-heres-what-actually-matters/`. There is no `/posts/{slug}/` page. Preview returned HTTP 404 for that shape and HTTP 200 for both original post URLs.
 
-The new top-level pages are `about`, `archives`, `certifications`, `github-stats`, `posts`, `quest`, `search`, `start-here`, and `tags`. None of those names is a current post slug. `assertPostRouteAvailable` throws at build time if a future post file would take one of those paths.
+The published top-level pages are `about`, `archives`, `certifications`, `posts`, `search`, `start-here`, and `tags`. `github-stats` and `quest` are not published. Those names, including the two unpublished ones, are not current post slugs. `assertPostRouteAvailable` throws at build time if a future post file would take one of those paths. `quest_id` stays in the post schema. |
 
 `main` did not publish a page 2. Page size was 10 and there are 2 posts, so there is no `/2/`, `/tag/{tag}/page2/`, or `/author/jamie/page2/` to redirect.
 
@@ -185,11 +185,11 @@ Preview on `127.0.0.1:4321` returned HTTP 200 for `/feed.xml` (refresh to `/rss.
 
 ### Launch checklist
 
-`docs/LAUNCH-CHECKLIST.md` is a one-time list for the relaunch. It is not routed from `src/pages/`, so `npm run build` does not publish it. It adapts the pre-launch site checks and the owned, rented, and borrowed channel split from Corey Haines's launch skill (`coreyhaines31/marketingskills`, MIT, copyright 2025). The file credits that skill. It does not include the skill's Product Hunt steps or its affiliate link. The checks name this repo's files: `public/CNAME`, the two `/{slug}/` posts, `/rss.xml`, Pagefind, dark and light, the curated cards in `src/content/certifications/`, and the `/github-stats` placeholder. The channel list is the LinkedIn and X URLs in `astro-paper.config.ts`, the Nutanix community Jamie already uses, and the GitHub profile README for `nutanixguy`, which is a different repo. No traffic or follower numbers are stated, because this repo has none.
+`docs/LAUNCH-CHECKLIST.md` is a one-time list for the relaunch. It is not routed from `src/pages/`, so `npm run build` does not publish it. It adapts the pre-launch site checks and the owned, rented, and borrowed channel split from Corey Haines's launch skill (`coreyhaines31/marketingskills`, MIT, copyright 2025). The file credits that skill. It does not include the skill's Product Hunt steps or its affiliate link. The checks name this repo's files: `public/CNAME`, the two `/{slug}/` posts, `/rss.xml`, Pagefind, dark and light, and the curated cards in `src/content/certifications/`. `/github-stats` is not published. The channel list is the LinkedIn and X URLs in `astro-paper.config.ts`, the Nutanix community Jamie already uses, and the GitHub profile README for `nutanixguy`, which is a different repo. No traffic or follower numbers are stated, because this repo has none.
 
 ### Quest id stays in the data and off the post
 
-`quest_id` is still an optional field in `src/content.config.ts`, and both posts still set it. `src/components/PostMeta.astro` no longer prints that value or a link to `/quest`. A post whose only extra field is `quest_id` does not get a Before you start box. Estimated time, updated date, prerequisites, and objectives still render. The heading visitors see is "Before you start", and its id is `before-you-start-heading`. `/quest` still lists the ids that are already on the posts. That page was not changed.
+`quest_id` is still an optional field in `src/content.config.ts`, and both posts still set it. `src/components/PostMeta.astro` does not print that value. A post whose only extra field is `quest_id` does not get a Before you start box. Estimated time, updated date, prerequisites, and objectives still render. The heading visitors see is "Before you start", and its id is `before-you-start-heading`. `/quest` is not published. |
 
 ### Certifications live on About
 
@@ -206,7 +206,7 @@ The standalone certifications page is gone from the nav. `src/pages/about.astro`
 - Timezone `America/New_York` is an assumption. The about page says "Based in Georgia." The removed author file on `main` (`src/content/authors/jamie.json`) said "Georgia, USA". If that Georgia is the country, this timezone is wrong.
 - `features.editPost.enabled` is false. The theme default pointed at `github.com/satnaing/astro-paper`.
 - The About certification cards are the curated LinkedIn set in `src/content/certifications/`. Older and expired credentials from that same LinkedIn read are not in the YAML. The About prose still mentions a broader set in passing.
-- `/quest` is a coming-soon page and is not in the nav. Start here and GitHub stats are.
+- Start here is in the nav. `/quest` and `/github-stats` are not published.
 - `package.json` overrides `@astrojs/markdown-satteri` to `0.4.6`. See section 7.
 - AstroPaper's own `.github/workflows/ci.yml` uses pnpm and runs on pull requests. It was not copied. The template has no deploy workflow, so there was nothing to delete. This branch's only workflow is the original `deploy.yml`.
 
@@ -272,7 +272,7 @@ Not part of that smoke test: keyboard-only navigation, a screen reader, a phone 
 
 Astro's `image()` schema treated `/assets/images/...` as an imported file and failed the build with `ImageNotFound`. Those files live in `public/`, which is copied as-is and is not an import. `src/content.config.ts` accepts a root-relative string first, and only then tries `image()` for a relative path under `src/`.
 
-Pagefind's default UI only indexes HTML marked `data-pagefind-body`. That is why search returns the two posts and not Start here or the placeholders. That surprised me until the build log said "Ignoring pages without this tag."
+Pagefind's default UI only indexes HTML marked `data-pagefind-body`. That is why search returns the two posts and not Start here. That surprised me until the build log said "Ignoring pages without this tag."
 
 The deploy workflow is safe for this branch only because its `on.push.branches` list is `[main]` and it also allows `workflow_dispatch`. A branch name does not protect you if someone later adds `pull_request` or `**` to that trigger. Read the file before the next push.
 
@@ -285,9 +285,8 @@ I compared `.github/workflows/deploy.yml` with this branch and did not edit it. 
 - `America/New_York` may be wrong if "Georgia" in the about page is not the US state.
 - `updated` duplicates the publish timestamp. There is no evidence the posts were revised later.
 - `est_minutes`, `level`, `quest_id`, prerequisites, and objectives were filled in for the preview. They are not from the original frontmatter.
-- `/github-stats` does not fetch anything. A future build step could read public GitHub data for `nutanixguy` while `npm run build` runs. That step is not designed here, and no token should be added for it.
+- `/github-stats` and `/quest` are not published. `quest_id` remains optional in `src/content.config.ts`. The post ids are `aos-7-5-briefing` and `pc-view-by`.
 - The certifications YAML is fiction. It renders on `/about#certifications`. `/certifications` only redirects there. It is not a credential inventory.
-- `/quest` does not run a quest. The ids `aos-7-5-briefing` and `pc-view-by` are labels on the posts.
 - `scripts/import-wordpress.py` still targets `src/content/blog` and writes `pubDate` plus `categories`. Running it would not produce valid AstroPaper posts. Not run.
 - Search does not include the new pages. Add `data-pagefind-body` on those pages if they should be searchable.
 - The theme's OS theme-change listener can leave dark mode. Not tested.
