@@ -40,6 +40,8 @@ export function getPostSlug(id: string, filePath: string | undefined): string {
 /**
  * Top-level routes that are not posts. A post file with one of these names
  * would replace that page, because post pages are served at /{slug}/.
+ * github-stats and quest are not published. They stay reserved so a post
+ * cannot take the URL a later page would use.
  */
 const RESERVED_ROOT_SEGMENTS = new Set([
   "404",

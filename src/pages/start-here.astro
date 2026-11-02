@@ -17,14 +17,11 @@ const posts = getSortedPosts(await getCollection("posts"));
 
 <Layout
   title={`Start here | ${config.site.title}`}
-  description="Where to begin on Nutanix Vibes, and what is still a placeholder."
+  description="Where to begin on Nutanix Vibes."
 >
   <Header />
   <Breadcrumb />
-  <Main
-    pageTitle="Start here"
-    pageDesc="A short map of the site. Two posts are real. GitHub stats and Quest are still placeholders."
-  >
+  <Main pageTitle="Start here">
     <div class="max-w-app space-y-4">
       <p>
         I'm Jamie Terrell. I run Nutanix, Citrix, and Azure for a healthcare
@@ -54,39 +51,6 @@ const posts = getSortedPosts(await getCollection("posts"));
     <ul class="mt-6">
       {posts.map(post => <Card variant="h3" {...post} />)}
     </ul>
-
-    <div class="max-w-app mt-8 space-y-4">
-      <p>
-        <LinkButton
-          class="hover:text-accent underline decoration-dashed underline-offset-4"
-          href={`${getRelativeLocaleUrl(locale, "about")}#certifications`}
-        >
-          Certifications
-        </LinkButton>{" "}
-        are a curated list on the About page. The full list is on LinkedIn.
-      </p>
-      <h2 class="font-accent text-xl font-semibold">Not built yet</h2>
-      <ul class="list-disc space-y-2 ps-5">
-        <li>
-          <LinkButton
-            class="hover:text-accent underline decoration-dashed underline-offset-4"
-            href={getRelativeLocaleUrl(locale, "github-stats")}
-          >
-            GitHub stats
-          </LinkButton>{" "}
-          explains a future build-time fetch. This preview does not call GitHub.
-        </li>
-        <li>
-          <LinkButton
-            class="hover:text-accent underline decoration-dashed underline-offset-4"
-            href={getRelativeLocaleUrl(locale, "quest")}
-          >
-            Quest
-          </LinkButton>{" "}
-          is reserved. The route is a coming-soon page. It is not in the nav.
-        </li>
-      </ul>
-    </div>
   </Main>
   <Footer />
 </Layout>
