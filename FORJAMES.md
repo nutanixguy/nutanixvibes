@@ -53,6 +53,7 @@ The certification YAML is not its own page. `src/pages/about.astro` renders it a
 
 | Path | What it is |
 | --- | --- |
+| `docs/LAUNCH-CHECKLIST.md` | One-time pre-launch list for the nutanixvibes.com cutover. Not a site page. |
 | `astro-paper.config.ts` | Site name, URL, author, timezone, social links, Pagefind on, edit-post link off. This is the file you edit for site settings. |
 | `astro.config.ts` | Astro itself: Markdown plugins, sitemap, Tailwind, Google Sans Code, JetBrains Mono. |
 | `src/config.ts` | Applies defaults on top of `astro-paper.config.ts`. Do not put content here. |
@@ -181,6 +182,10 @@ These Casper URLs did exist and no longer have their own content. `astro.config.
 `/`, `/about/`, and `/404` exist on both builds, so they are not redirects. The sitemap filter drops the legacy paths and `/certifications`.
 
 Preview on `127.0.0.1:4321` returned HTTP 200 for `/feed.xml` (refresh to `/rss.xml`), `/author/jamie/` (refresh to `/about/`), `/tag/ahv/` (refresh to `/tags/ahv/`), and `/rss.xml` (the RSS document). `dist/CNAME` is `nutanixvibes.com`, copied from `public/CNAME`.
+
+### Launch checklist
+
+`docs/LAUNCH-CHECKLIST.md` is a one-time list for the relaunch. It is not routed from `src/pages/`, so `npm run build` does not publish it. It adapts the pre-launch site checks and the owned, rented, and borrowed channel split from Corey Haines's launch skill (`coreyhaines31/marketingskills`, MIT, copyright 2025). The file credits that skill. It does not include the skill's Product Hunt steps or its affiliate link. The checks name this repo's files: `public/CNAME`, the two `/{slug}/` posts, `/rss.xml`, Pagefind, dark and light, the EXAMPLE cards in `src/content/certifications/`, and the `/github-stats` placeholder. The channel list is the LinkedIn and X URLs in `astro-paper.config.ts`, the Nutanix community Jamie already uses, and the GitHub profile README for `nutanixguy`, which is a different repo. No traffic or follower numbers are stated, because this repo has none.
 
 ### Quest id stays in the data and off the post
 
