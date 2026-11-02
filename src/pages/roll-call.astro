@@ -1,0 +1,43 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Breadcrumb from "@/components/Breadcrumb.astro";
+import Main from "@/components/Main.astro";
+import Footer from "@/components/Footer.astro";
+import RollCallCard from "@/components/RollCallCard.astro";
+import config from "@/config";
+
+const intro =
+  "The Nutanix blogs I open when I want to see how someone else already solved it.";
+
+const peers = (await getCollection("rollCall")).sort((a, b) =>
+  a.id.localeCompare(b.id)
+);
+---
+
+<Layout title={`Roll Call | ${config.site.title}`} description={intro}>
+  <Header />
+  <Breadcrumb />
+  <Main pageTitle="Roll Call">
+    <p class="max-w-app mb-6">{intro}</p>
+    {
+      peers.length === 0 ? (
+        <p>No blogs in the roll call yet.</p>
+      ) : (
+        <ul class="grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2">
+          {peers.map(peer => (
+            <RollCallCard
+              name={peer.data.name}
+              url={peer.data.url}
+              author={peer.data.author}
+              language={peer.data.language}
+              focus={peer.data.focus}
+            />
+          ))}
+        </ul>
+      )
+    }
+  </Main>
+  <Footer />
+</Layout>

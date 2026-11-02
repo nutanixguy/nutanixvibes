@@ -106,6 +106,14 @@ const isActive = (path: string) => {
             {t.nav.startHere}
           </a>
         </li>
+        <li class="col-span-2">
+          <a
+            href={getRelativeLocaleUrl(locale, "roll-call")}
+            class:list={{ "active-nav": isActive("/roll-call") }}
+          >
+            {t.nav.rollCall}
+          </a>
+        </li>
         {
           features.showArchives && (
             <li class="col-span-2">

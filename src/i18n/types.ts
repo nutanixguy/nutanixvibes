@@ -7,6 +7,7 @@ export interface UIStrings {
     archives: string;
     search: string;
     startHere: string;
+    rollCall: string;
   };
   post: {
     publishedAt: string;
