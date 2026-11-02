@@ -62,7 +62,8 @@ The certification YAML is not its own page. `src/pages/about.astro` renders it a
 | `src/pages/about.astro` | Renders that prose, then the certifications section at `#certifications`. |
 | `src/content/certifications/` | Two fake YAML entries. The schema requires `label: EXAMPLE`. |
 | `src/pages/certifications.astro` | Static redirect to `/about#certifications`. Not a content page. |
-| `src/pages/` | Routes. A file here becomes a URL. `src/pages/quest.astro` is `/quest`. |
+| `src/pages/[...slug]/` | One post page per file in `src/content/posts/`, served at `/{slug}/`. |
+| `src/pages/` | Other routes. A file here becomes a URL. `src/pages/quest.astro` is `/quest`. The posts list stays at `/posts/`. |
 | `src/components/Header.astro` | Nav. Start here and GitHub stats are in this list. Certifications and Quest are not. |
 | `src/components/Card.astro` | Post card on the home page, the posts list, and Start here. |
 | `src/components/PostMeta.astro` | Level and topic badges, plus the "Before you start" block on a post. |
@@ -107,7 +108,7 @@ AstroPaper already has the fields the migration asked for (`pubDatetime`, `ogIma
 
 On `main`, `src/components/AlgoliaSearch.astro` loaded Algolia from a CDN when `SITE_CONFIG.algolia` was set. `src/config.ts` on `main` had no `algolia` block and no keys. No `.env` file is in the repo. Tracked source on this branch has no Algolia strings. GitHub Actions secrets were not inspected.
 
-`astro-paper.config.ts` sets `features.search` to `"pagefind"`. `npm run build` runs `pagefind --site dist`. This build indexed 2 pages and 505 words. Only posts carry `data-pagefind-body` (`src/pages/posts/[...slug]/index.astro`), so the placeholder pages are not in the index. A search for `prism` on the preview returned both posts. That was checked in the browser.
+`astro-paper.config.ts` sets `features.search` to `"pagefind"`. `npm run build` runs `pagefind --site dist`. Only posts carry `data-pagefind-body` (`src/pages/[...slug]/index.astro`), so the placeholder pages are not in the index. A search for `prism` on the preview returned both posts at `/{slug}/`. That was checked in the browser.
 
 ### Astro 7
 
@@ -144,6 +145,43 @@ That file's `:root` block is the source. `src/styles/theme.css` names the same c
 
 `#7855fa` on `#131313` is 3.96:1, under AA for normal text, so dark mode uses the dark-link purple instead. `#595959` on `#131313` is 2.65:1, so dark secondary text does not use `--secondary-text`. No automated axe scan was run. These ratios are from a local WCAG calculation, not from Nutanix.
 
+### Posts stay on the Casper URLs
+
+I built `main` at commit `6c3e966` and listed every HTML and XML file under `dist/`. The two posts were already at:
+
+- `/nutanix-7-5-just-dropped-heres-what-actually-matters/`
+- `/prism-central-tip-use-the-view-by-dropdown-for-faster-vm-audits/`
+
+Those paths are the post pages again. `getPostUrl` in `src/utils/getPostPaths.ts` no longer prefixes `posts/`. Cards, the RSS items in `src/pages/rss.xml.ts`, canonical and `og:url`, and Pagefind all use that helper or the built file path. A search for `prism` returned `/prism-central-tip-use-the-view-by-dropdown-for-faster-vm-audits/` and `/nutanix-7-5-just-dropped-heres-what-actually-matters/`. There is no `/posts/{slug}/` page. Preview returned HTTP 404 for that shape and HTTP 200 for both original post URLs.
+
+The new top-level pages are `about`, `archives`, `certifications`, `github-stats`, `posts`, `quest`, `search`, `start-here`, and `tags`. None of those names is a current post slug. `assertPostRouteAvailable` throws at build time if a future post file would take one of those paths.
+
+`main` did not publish a page 2. Page size was 10 and there are 2 posts, so there is no `/2/`, `/tag/{tag}/page2/`, or `/author/jamie/page2/` to redirect.
+
+These Casper URLs did exist and no longer have their own content. `astro.config.ts` `redirects` writes a static HTML page for each one: meta refresh, `noindex`, and a canonical link to the new URL. Tag and author feeds go to `/rss.xml` because this theme has one feed, not a feed per tag or author.
+
+| Old URL from the `main` build | New URL |
+| --- | --- |
+| `/feed.xml` | `/rss.xml` |
+| `/author/jamie/` | `/about/` |
+| `/author/jamie/feed.xml` | `/rss.xml` |
+| `/tag/ahv/` | `/tags/ahv/` |
+| `/tag/ahv/feed.xml` | `/rss.xml` |
+| `/tag/cvm/` | `/tags/cvm/` |
+| `/tag/cvm/feed.xml` | `/rss.xml` |
+| `/tag/ngt/` | `/tags/ngt/` |
+| `/tag/ngt/feed.xml` | `/rss.xml` |
+| `/tag/nutanix/` | `/tags/nutanix/` |
+| `/tag/nutanix/feed.xml` | `/rss.xml` |
+| `/tag/prism-central/` | `/tags/prism-central/` |
+| `/tag/prism-central/feed.xml` | `/rss.xml` |
+| `/tag/tips/` | `/tags/tips/` |
+| `/tag/tips/feed.xml` | `/rss.xml` |
+
+`/`, `/about/`, and `/404` exist on both builds, so they are not redirects. The sitemap filter drops the legacy paths and `/certifications`.
+
+Preview on `127.0.0.1:4321` returned HTTP 200 for `/feed.xml` (refresh to `/rss.xml`), `/author/jamie/` (refresh to `/about/`), `/tag/ahv/` (refresh to `/tags/ahv/`), and `/rss.xml` (the RSS document). `dist/CNAME` is `nutanixvibes.com`, copied from `public/CNAME`.
+
 ### Quest id stays in the data and off the post
 
 `quest_id` is still an optional field in `src/content.config.ts`, and both posts still set it. `src/components/PostMeta.astro` no longer prints that value or a link to `/quest`. A post whose only extra field is `quest_id` does not get a Before you start box. Estimated time, updated date, prerequisites, and objectives still render. The heading visitors see is "Before you start", and its id is `before-you-start-heading`. `/quest` still lists the ids that are already on the posts. That page was not changed.
@@ -156,7 +194,7 @@ The standalone certifications page is gone from the nav. The same two YAML files
 
 - Dark is the default. `src/layouts/Layout.astro` puts `data-theme="dark"` on `<html>`. The boot script stays on dark unless `localStorage` is exactly `"light"` or `"dark"`. `src/scripts/theme.ts` uses the same rule when nothing is stored. A later operating-system theme change still overwrites that choice. That listener was not exercised.
 - The header is `max-w-6xl` so the extra nav links fit. Article text stays `max-w-3xl` (`src/styles/global.css`).
-- Post URLs are now `/posts/{filename}`. Example: `/posts/prism-central-tip-use-the-view-by-dropdown-for-faster-vm-audits/`.
+- The posts list is `/posts/`. Individual posts are not under that prefix. See the decision below.
 - `updated` on both posts equals `pubDatetime`. The Casper files had one `date` and no revision date. Both timestamps are `12:00:00.000Z` so the calendar day stays 30 Jan 2026 and 16 Feb 2026 in `America/New_York`.
 - `est_minutes` is 5 for the 7.5 post and 8 for the View by post. `wc -w` on the markdown bodies was 530 and 356 words. Five minutes is a read of the briefing. Eight minutes allows clicking through the Prism views the second post describes. These are estimates, not measured lab times.
 - Level `beginner` on the View by post: it is a Prism Central UI tip. Level `intermediate` on the 7.5 post: it assumes CVM, CCLM, NGT, and protection policies.
@@ -214,7 +252,7 @@ Run on this branch in this environment, after `npm ci`:
 6. `npm run preview` came up at http://127.0.0.1:4321/.
 7. A headless Chrome pass at viewport width 1280 opened these URLs. Each returned HTTP 200, set `data-theme` to the requested mode, and threw no page errors:
    - `/`
-   - `/posts/prism-central-tip-use-the-view-by-dropdown-for-faster-vm-audits/`
+   - `/prism-central-tip-use-the-view-by-dropdown-for-faster-vm-audits/`
    - `/about/` (the certifications section was in the document)
    - `/search/`
 8. On `/search/`, the Pagefind box accepted `prism` and showed 2 results.
@@ -233,10 +271,12 @@ Pagefind's default UI only indexes HTML marked `data-pagefind-body`. That is why
 
 The deploy workflow is safe for this branch only because its `on.push.branches` list is `[main]` and it also allows `workflow_dispatch`. A branch name does not protect you if someone later adds `pull_request` or `**` to that trigger. Read the file before the next push.
 
+I compared `.github/workflows/deploy.yml` with this branch and did not edit it. `actions/setup-node@v4` with `node-version: 22` installs the newest Node 22 in the `actions/node-versions` manifest. On 2 Nov 2026 that newest release is `22.23.4`, the same value as `.nvmrc`. It satisfies `package.json` `engines.node` (`>=22.23.4`) and the installed `astro` package engines (`node >=22.23.4`, `npm >=9.6.5`). Node 22.23.4 includes npm 10.9.9. The workflow runs `npm ci` and then `npm run build`, which is the script in `package.json`: `astro check && astro build && pagefind --site dist && node copy-pagefind.mjs`. The upload path is `dist`. That is the same package manager, the same build command, and a Node version this branch accepts. `SITE_URL` is set in the workflow and is not read. The site URL comes from `astro-paper.config.ts` and is already `https://nutanixvibes.com`. No change to `deploy.yml` is required for this branch to build. I did not run the GitHub Actions workflow itself.
+
 ## 8. Open questions and known gaps
 
 - Merging this branch would change production. `deploy.yml` on `main` would build this tree and deploy it. That deploy was not run. This PR is a draft and should not be merged.
-- Old URLs were `/{slug}`. New URLs are `/posts/{slug}`. Nothing here adds redirects. Untested against any existing links.
+- Post URLs match `main` again (`/{slug}/`). The Casper tag, author, and feed URLs redirect as listed in section 5. A GitHub Pages deploy of this branch was not run, so the directory-style redirect pages (`feed.xml/index.html` and the rest) were checked with `astro preview`, not on Pages itself.
 - `America/New_York` may be wrong if "Georgia" in the about page is not the US state.
 - `updated` duplicates the publish timestamp. There is no evidence the posts were revised later.
 - `est_minutes`, `level`, `quest_id`, prerequisites, and objectives were filled in for the preview. They are not from the original frontmatter.
@@ -247,6 +287,6 @@ The deploy workflow is safe for this branch only because its `on.push.branches` 
 - Search does not include the new pages. Add `data-pagefind-body` on those pages if they should be searchable.
 - The theme's OS theme-change listener can leave dark mode. Not tested.
 - No axe scan, no screen reader, no mobile viewport check. Desktop 1280 dark and light were screenshotted.
-- `features.dynamicOgImage` is still on. Posts that set `ogImage` skip the generated PNG (`src/pages/posts/[...slug]/index.png.ts`). `/og.png` is still generated for the site fallback. A post with no `ogImage` was not tested.
+- `features.dynamicOgImage` is still on. Posts that set `ogImage` skip the generated PNG (`src/pages/[...slug]/index.png.ts`). `/og.png` is still generated for the site fallback. A post with no `ogImage` was not tested.
 - Font download needs network at build time. An offline build was not tested.
 - Upstream AstroPaper CI (pnpm, Node 24) was not added. This branch has no PR lint workflow of its own. Lint was run locally.

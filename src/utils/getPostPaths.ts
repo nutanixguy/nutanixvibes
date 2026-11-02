@@ -38,15 +38,51 @@ export function getPostSlug(id: string, filePath: string | undefined): string {
 }
 
 /**
+ * Top-level routes that are not posts. A post file with one of these names
+ * would replace that page, because post pages are served at /{slug}/.
+ */
+const RESERVED_ROOT_SEGMENTS = new Set([
+  "404",
+  "about",
+  "archives",
+  "author",
+  "certifications",
+  "feed.xml",
+  "github-stats",
+  "og.png",
+  "posts",
+  "quest",
+  "robots.txt",
+  "rss.xml",
+  "search",
+  "start-here",
+  "tag",
+  "tags",
+]);
+
+export function assertPostRouteAvailable(
+  id: string,
+  filePath: string | undefined
+): void {
+  const slugPath = getPostSlugPath(id, filePath);
+  const root = slugPath.split("/")[0] ?? slugPath;
+  if (RESERVED_ROOT_SEGMENTS.has(root)) {
+    throw new Error(
+      `Post "${slugPath}" uses /${root}/, which is already a site page. Rename the post file.`
+    );
+  }
+}
+
+/**
  * Returns a fully navigable URL for use in `<a href>` and RSS links.
- * Applies both locale routing and the configured Astro base via
+ * Posts stay at /{slug}/, the same path the Casper site published.
+ * Applies locale routing and the configured Astro base via
  * `getRelativeLocaleUrl`.
- * e.g. `/posts/my-post` or `/en/posts/my-post`
  */
 export function getPostUrl(
   id: string,
   filePath: string | undefined,
   locale: string | undefined = config.site.lang
 ): string {
-  return getRelativeLocaleUrl(locale, `posts/${getPostSlugPath(id, filePath)}`);
+  return getRelativeLocaleUrl(locale, getPostSlugPath(id, filePath));
 }

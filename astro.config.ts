@@ -20,15 +20,48 @@ import { transformerFileName } from "./src/utils/transformers/fileName";
 import { rehypeTableWrapper } from "./src/utils/rehypeTableWrapper";
 import config from "./astro-paper.config";
 
+// Real URLs from the Casper build on main that this theme no longer serves.
+// Post URLs stay at /{slug}/, so they are not in this list.
+const legacyRedirects: Record<string, string> = {
+  "/feed.xml": "/rss.xml",
+  "/author/jamie": "/about/",
+  "/author/jamie/feed.xml": "/rss.xml",
+  "/tag/ahv": "/tags/ahv/",
+  "/tag/ahv/feed.xml": "/rss.xml",
+  "/tag/cvm": "/tags/cvm/",
+  "/tag/cvm/feed.xml": "/rss.xml",
+  "/tag/ngt": "/tags/ngt/",
+  "/tag/ngt/feed.xml": "/rss.xml",
+  "/tag/nutanix": "/tags/nutanix/",
+  "/tag/nutanix/feed.xml": "/rss.xml",
+  "/tag/prism-central": "/tags/prism-central/",
+  "/tag/prism-central/feed.xml": "/rss.xml",
+  "/tag/tips": "/tags/tips/",
+  "/tag/tips/feed.xml": "/rss.xml",
+};
+
+function pathnameOf(page: string): string {
+  return new URL(page).pathname.replace(/\/$/, "") || "/";
+}
+
+const legacyPaths = new Set(
+  Object.keys(legacyRedirects).map(path => path.replace(/\/$/, "") || "/")
+);
+
 export default defineConfig({
   site: config.site.url,
+  redirects: legacyRedirects,
   integrations: [
     mdx(),
     sitemap({
-      filter: page =>
-        !page.includes("/certifications") &&
-        (config.features?.showArchives !== false ||
-          !page.endsWith("/archives/")),
+      filter: page => {
+        const path = pathnameOf(page);
+        if (path === "/certifications" || legacyPaths.has(path)) return false;
+        return (
+          config.features?.showArchives !== false ||
+          !page.endsWith("/archives/")
+        );
+      },
     }),
   ],
   i18n: {
