@@ -1,60 +1,75 @@
-import { defineCollection, reference } from 'astro:content';
-import { z } from 'astro/zod';
-import { glob } from 'astro/loaders';
+import { defineCollection } from "astro:content";
+import { z } from "astro/zod";
+import { glob } from "astro/loaders";
+import config from "@/config";
+
+export const BLOG_PATH = "src/content/posts";
 
 const posts = defineCollection({
-  loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: './src/content/posts' }),
+  loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: `./${BLOG_PATH}` }),
+  schema: ({ image }) =>
+    z.object({
+      author: z.string().default(config.site.author),
+      pubDatetime: z.date(),
+      modDatetime: z.date().optional().nullable(),
+      title: z.string(),
+      featured: z.boolean().optional(),
+      draft: z.boolean().optional(),
+      tags: z.array(z.string()).default(["others"]),
+      // Root-relative public files stay strings. Relative paths still use Astro's
+      // image helper so files under src/ can be optimized.
+      ogImage: z
+        .string()
+        .refine(value => value.startsWith("/"), {
+          message: "Public OG images must be root-relative",
+        })
+        .or(image())
+        .optional(),
+      description: z.string(),
+      canonicalURL: z.string().optional(),
+      hideEditPost: z.boolean().optional(),
+      // An empty value means "not set", so the site timezone applies.
+      timezone: z
+        .string()
+        .optional()
+        .transform(tz => tz || undefined),
+      level: z.enum(["beginner", "intermediate", "advanced"]).optional(),
+      topic: z.string().optional(),
+      prerequisites: z.array(z.string()).optional(),
+      objectives: z.array(z.string()).optional(),
+      est_minutes: z.number().int().positive().optional(),
+      quest_id: z.string().optional(),
+      updated: z.date().optional(),
+    }),
+});
+
+const pages = defineCollection({
+  loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: "./src/content/pages" }),
   schema: z.object({
     title: z.string(),
     description: z.string().optional(),
-    cover: z.string().optional().nullable(),
-    date: z.union([z.date(), z.string()]),
-    tags: z.preprocess(
-      (val) => {
-        if (!val) return [];
-        if (typeof val === 'string') return [val];
-        if (Array.isArray(val)) return val;
-        return [];
-      },
-      z.array(z.string())
-    ).default([]),
-    class: z.string().optional(),
-    subclass: z.string().optional(),
-    author: reference('authors'), // Type-safe reference to an author document
-    current: z.string().optional(),
-    navigation: z.union([z.boolean(), z.string()]).optional(),
-    layout: z.string().optional(),
-    disqus: z.boolean().optional(),
+    ogImage: z.string().optional(),
+    canonicalURL: z.string().optional(),
   }),
 });
 
-const authors = defineCollection({
-  loader: glob({ pattern: '**/*.json', base: './src/content/authors' }),
+const certifications = defineCollection({
+  loader: glob({
+    pattern: "**/*.{yml,yaml}",
+    base: "./src/content/certifications",
+  }),
   schema: z.object({
-    username: z.string(),
-    name: z.string(),
-    bio: z.string().optional(),
-    picture: z.string().optional().nullable(),
-    location: z.string().optional(),
-    url: z.union([z.string(), z.boolean()]).optional(),
-    url_full: z.union([z.string(), z.boolean()]).optional(),
-    facebook: z.union([z.string(), z.boolean()]).optional(),
-    twitter: z.union([z.string(), z.boolean()]).optional(),
-    cover: z.union([z.string(), z.boolean()]).optional(),
+    title: z.string(),
+    issuer: z.string(),
+    // YYYY-MM. Omitted when LinkedIn has no issue date.
+    issued: z
+      .string()
+      .regex(/^\d{4}-\d{2}$/)
+      .optional(),
+    // Newest first. Same-month ties use a suffix, for example 2024-12-02.
+    sortKey: z.string(),
+    url: z.url().optional(),
   }),
 });
 
-const tags = defineCollection({
-  loader: glob({ pattern: '**/*.json', base: './src/content/tags' }),
-  schema: z.object({
-    name: z.string(),
-    description: z.union([z.string(), z.boolean()]).optional(),
-    cover: z.union([z.string(), z.boolean()]).optional(),
-  }),
-});
-
-export const collections = {
-  posts,
-  authors,
-  tags,
-};
+export const collections = { posts, pages, certifications };

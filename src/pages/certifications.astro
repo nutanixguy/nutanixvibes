@@ -1,0 +1,21 @@
+---
+const base = import.meta.env.BASE_URL;
+const prefix = base.endsWith("/") ? base : `${base}/`;
+const target = `${prefix}about#certifications`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={new URL(`${prefix}about`, Astro.site)} />
+    <meta http-equiv="refresh" content={`0;url=${target}`} />
+    <title>Redirecting to About</title>
+  </head>
+  <body>
+    <p>
+      Certifications are on the <a href={target}>About page</a>.
+    </p>
+  </body>
+</html>

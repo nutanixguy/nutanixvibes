@@ -1,0 +1,64 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Breadcrumb from "@/components/Breadcrumb.astro";
+import Main from "@/components/Main.astro";
+import Footer from "@/components/Footer.astro";
+import config from "@/config";
+
+// Static placeholder. Do not fetch GitHub during this build.
+const rows = [
+  { label: "Public repositories", value: "Not fetched" },
+  { label: "Followers", value: "Not fetched" },
+  { label: "Most recent public push", value: "Not fetched" },
+];
+---
+
+<Layout
+  title={`GitHub stats | ${config.site.title}`}
+  description="Placeholder. GitHub stats are not fetched in this preview."
+>
+  <Header />
+  <Breadcrumb />
+  <Main
+    pageTitle="GitHub stats"
+    pageDesc="Placeholder. This build does not call GitHub."
+  >
+    <div class="max-w-app space-y-4">
+      <p>
+        The numbers below are for the public GitHub account
+        <code>nutanixguy</code>. A later change can read those public counts
+        while <code>npm run build</code> runs, then write them into this static page.
+        The browser would not call GitHub.
+      </p>
+      <p>
+        That build step is not in this preview. There is no token and no network
+        request on this page.
+      </p>
+      <table class="w-full border-collapse text-sm">
+        <caption class="sr-only">
+          GitHub stats placeholder for nutanixguy. No values have been fetched.
+        </caption>
+        <thead>
+          <tr class="border-border border-b text-left">
+            <th scope="col" class="py-2 pe-4 font-medium">Stat</th>
+            <th scope="col" class="py-2 font-medium">Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            rows.map(row => (
+              <tr class="border-border border-b">
+                <th scope="row" class="py-2 pe-4 text-left font-normal">
+                  {row.label}
+                </th>
+                <td class="text-muted-foreground py-2">{row.value}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </Main>
+  <Footer />
+</Layout>

@@ -1,45 +1,39 @@
 # Nutanix Vibes
 
-Tech blog built with [Casper Astro](https://github.com/AntonyLeons/casper) and hosted on GitHub Pages.
+Preview of the blog rebuilt on [AstroPaper](https://github.com/satnaing/astro-paper) (MIT). This branch is a throwaway preview. Do not merge it to `main`.
+
+The live site is still the Casper theme on `main`. Pushes to `main` are what deploy to GitHub Pages. This branch does not change that workflow.
 
 ## Local development
 
+Node.js 22.23.4 or newer (`engines` and `.nvmrc`).
+
 ```bash
-npm install
-SITE_URL=https://nutanixvibes.com npm run dev
+npm ci
+npm run dev
 ```
 
 Open [http://localhost:4321/](http://localhost:4321/).
 
+Search uses Pagefind, which indexes `dist/` during `npm run build`. `npm run dev` can show an empty search box until you have built once.
+
+## Checks
+
+```bash
+npm run lint
+npm run format:check
+npm run build
+npm run preview
+```
+
 ## Content
 
 - Posts: `src/content/posts/`
-- About page: `src/data/about.md`
-- Author profile: `src/content/authors/jamie.json`
-- Site config (title, social links): `src/config.ts`
+- About page: `src/content/pages/about.md`
+- Example certifications: `src/content/certifications/`
+- Site config: `astro-paper.config.ts`
 - Images: `public/assets/images/`
 
-## Import WordPress content
+## License
 
-Place a WordPress export XML file in `imports/`, then run:
-
-```bash
-python3 scripts/import-wordpress.py
-```
-
-Note: the import script targets the legacy blog layout. After migrating to Casper, add new posts manually under `src/content/posts/`.
-
-## Deploy
-
-Pushes to `main` deploy via GitHub Actions to https://nutanixvibes.com
-
-Set the custom domain in GitHub repo **Settings → Pages** and point DNS at GitHub Pages (see [GitHub docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site)).
-
-## Social links
-
-Configured in `src/config.ts`:
-
-- Email: jamie@nutanixguy.com
-- GitHub: nutanixguy
-- LinkedIn: jamieterrell
-- X: nutanixguy
+The theme is included under the MIT license. See `LICENSE`. Copyright (c) 2023 Sat Naing.

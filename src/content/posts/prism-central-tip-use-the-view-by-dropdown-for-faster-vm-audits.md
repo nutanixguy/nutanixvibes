@@ -1,15 +1,24 @@
 ---
-title: "Prism Central Tip: Use the \"View By\" Dropdown for Faster VM Audits"
+title: 'Prism Central Tip: Use the "View By" Dropdown for Faster VM Audits'
 description: "Most admins stick to searching or sorting in the VM list, but the View by dropdown in Nutanix Prism Central is a much faster way to spot issues."
-cover: assets/images/prism-central-view-by-hero.png
-date: 2026-02-16
-tags: [Nutanix, "Prism Central", Tips]
-class: post-template
-subclass: post
-author: jamie
-current: post
-navigation: true
-disqus: false
+ogImage: /assets/images/prism-central-view-by-hero.png
+pubDatetime: 2026-02-16T12:00:00.000Z
+updated: 2026-02-16T12:00:00.000Z
+author: Jamie Terrell
+tags:
+  - Nutanix
+  - Prism Central
+  - Tips
+level: beginner
+topic: Prism Central
+prerequisites:
+  - Access to the Prism Central VM list
+  - Permission to add columns and change the View by grouping
+objectives:
+  - Group the VM list with View by instead of only sorting it
+  - Find unprotected VMs, snapshot-heavy guests, and missing categories
+est_minutes: 8
+quest_id: pc-view-by
 ---
 
 Most admins stick to searching or sorting in the VM list, but the **View by** dropdown in [Nutanix](https://www.nutanix.com/) Prism Central is a much faster way to spot issues.

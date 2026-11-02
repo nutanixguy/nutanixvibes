@@ -1,49 +1,41 @@
-export const SITE_CONFIG = {
-  title: 'Nutanix Vibes',
-  description: 'Good Vibes, Great Infrastructure',
-  cover: 'assets/images/about-hero.jpg',
-  logo: 'assets/images/cropped-image.jpg',
-  logoDark: 'assets/images/cropped-image.jpg',
-  favicon: 'assets/images/cropped-image.jpg',
-  navigation: true,
-  subscribers: false,
-  xUsername: 'nutanixguy',
-  facebook: false,
-  github: 'nutanixguy',
-  linkedin: 'https://www.linkedin.com/in/jamieterrell/',
-  email: 'jamie@nutanixguy.com',
-  disqus: false,
-  wordsPerMinute: 200,
-  pageSize: 10,
+/**
+ * Internal resolved configuration used throughout the codebase.
+ *
+ * Prefer editing `astro-paper.config.ts` instead of this file. This module exists to
+ * apply defaults and expose a fully-resolved config shape (`ResolvedAstroPaperConfig`).
+ */
+import userConfig from "@/astro-paper.config";
+import type { ResolvedAstroPaperConfig } from "./types/config";
+import { PUBLIC_GOOGLE_SITE_VERIFICATION } from "astro:env/client";
+
+const DEFAULT_OG_IMAGE = "og.jpg";
+
+const config: ResolvedAstroPaperConfig = {
+  site: {
+    ...userConfig.site,
+    ogImage: userConfig.site.ogImage ?? DEFAULT_OG_IMAGE,
+    lang: userConfig.site.lang ?? "en",
+    timezone: userConfig.site.timezone ?? "UTC",
+    dir: userConfig.site.dir ?? "ltr",
+    googleVerification:
+      userConfig.site.googleVerification || PUBLIC_GOOGLE_SITE_VERIFICATION,
+  },
+  posts: {
+    perPage: userConfig.posts?.perPage ?? 4,
+    perIndex: userConfig.posts?.perIndex ?? 4,
+    // Deprecated and unused. Not read from userConfig, so builds don't warn about it.
+    scheduledPostMargin: 15 * 60 * 1000,
+  },
+  features: {
+    lightAndDarkMode: userConfig.features?.lightAndDarkMode ?? true,
+    dynamicOgImage: userConfig.features?.dynamicOgImage ?? true,
+    showArchives: userConfig.features?.showArchives ?? true,
+    showBackButton: userConfig.features?.showBackButton ?? true,
+    editPost: userConfig.features?.editPost ?? { enabled: false },
+    search: userConfig.features?.search ?? "pagefind",
+  },
+  socials: userConfig.socials ?? [],
+  shareLinks: userConfig.shareLinks ?? [],
 };
 
-export function getAssetUrl(path: string | null | undefined): string {
-  if (!path) return '';
-  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('//')) {
-    return path;
-  }
-  const base = import.meta.env.BASE_URL;
-  const cleanPath = path.replace(/^\//, '');
-  return `${base}${cleanPath}`;
-}
-
-export function getExcerpt(content: string, limit = 33): string {
-  const stripped = content
-    .replace(/<[^>]*>/g, '')
-    .replace(/[#*`_\[\]()\-+!]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-  const words = stripped.split(' ');
-  if (words.length <= limit) return stripped;
-  return words.slice(0, limit).join(' ') + '...';
-}
-
-export function getReadingTime(content: string, wpm = SITE_CONFIG.wordsPerMinute): string {
-  const stripped = content.replace(/<[^>]*>/g, '').trim();
-  if (!stripped) return '1 min read';
-  const words = stripped.split(/\s+/).length;
-  if (words <= wpm) {
-    return '1 min read';
-  }
-  return `${Math.ceil(words / wpm)} min read`;
-}
+export default config;

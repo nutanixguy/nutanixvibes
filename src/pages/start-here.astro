@@ -1,0 +1,92 @@
+---
+import { getCollection } from "astro:content";
+import { getRelativeLocaleUrl } from "astro:i18n";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Breadcrumb from "@/components/Breadcrumb.astro";
+import Main from "@/components/Main.astro";
+import Footer from "@/components/Footer.astro";
+import Card from "@/components/Card.astro";
+import LinkButton from "@/components/LinkButton.astro";
+import { getSortedPosts } from "@/utils/getSortedPosts";
+import config from "@/config";
+
+const locale = Astro.currentLocale ?? config.site.lang;
+const posts = getSortedPosts(await getCollection("posts"));
+---
+
+<Layout
+  title={`Start here | ${config.site.title}`}
+  description="Where to begin on Nutanix Vibes, and what is still a placeholder."
+>
+  <Header />
+  <Breadcrumb />
+  <Main
+    pageTitle="Start here"
+    pageDesc="A short map of the site. Two posts are real. GitHub stats and Quest are still placeholders."
+  >
+    <div class="max-w-app space-y-4">
+      <p>
+        I'm Jamie Terrell. I run Nutanix, Citrix, and Azure for a healthcare
+        company, and I write down the operational problems that were hard to
+        search for later. The longer version is on the{" "}
+        <LinkButton
+          class="hover:text-accent underline decoration-dashed underline-offset-4"
+          href={getRelativeLocaleUrl(locale, "about")}
+        >
+          about page
+        </LinkButton>
+        .
+      </p>
+      <p>If you only have time for one post, use the level badge:</p>
+      <ul class="list-disc space-y-2 ps-5">
+        <li>
+          <span class="font-medium">Beginner</span> means you need Prism Central open,
+          not a design document.
+        </li>
+        <li>
+          <span class="font-medium">Intermediate</span> means you already know the
+          product names and you are deciding what to plan.
+        </li>
+      </ul>
+    </div>
+
+    <ul class="mt-6">
+      {posts.map(post => <Card variant="h3" {...post} />)}
+    </ul>
+
+    <div class="max-w-app mt-8 space-y-4">
+      <p>
+        <LinkButton
+          class="hover:text-accent underline decoration-dashed underline-offset-4"
+          href={`${getRelativeLocaleUrl(locale, "about")}#certifications`}
+        >
+          Certifications
+        </LinkButton>{" "}
+        are a curated list on the About page. The full list is on LinkedIn.
+      </p>
+      <h2 class="font-accent text-xl font-semibold">Not built yet</h2>
+      <ul class="list-disc space-y-2 ps-5">
+        <li>
+          <LinkButton
+            class="hover:text-accent underline decoration-dashed underline-offset-4"
+            href={getRelativeLocaleUrl(locale, "github-stats")}
+          >
+            GitHub stats
+          </LinkButton>{" "}
+          explains a future build-time fetch. This preview does not call GitHub.
+        </li>
+        <li>
+          <LinkButton
+            class="hover:text-accent underline decoration-dashed underline-offset-4"
+            href={getRelativeLocaleUrl(locale, "quest")}
+          >
+            Quest
+          </LinkButton>{" "}
+          is reserved. The route is a coming-soon page. It is not in the nav.
+        </li>
+      </ul>
+    </div>
+  </Main>
+  <Footer />
+</Layout>

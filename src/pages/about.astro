@@ -1,12 +1,97 @@
 ---
-import PageLayout from '../layouts/PageLayout.astro';
-import { Content, frontmatter } from '../data/about.md';
+import { getCollection, getEntry, render } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Breadcrumb from "@/components/Breadcrumb.astro";
+import Main from "@/components/Main.astro";
+import Footer from "@/components/Footer.astro";
+import config from "@/config";
+
+const about = await getEntry("pages", "about");
+
+if (!about) {
+  throw new Error(
+    "Missing content entry: `about.md` or `about.mdx` in `src/content/pages/`"
+  );
+}
+
+const { Content } = await render(about);
+const certifications = (await getCollection("certifications")).sort((a, b) =>
+  b.data.sortKey.localeCompare(a.data.sortKey)
+);
+
+function issuedLabel(issued: string): string {
+  const [year, month] = issued.split("-");
+  const date = new Date(Date.UTC(Number(year), Number(month) - 1, 1));
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}
+
+const linkedInUrl = "https://www.linkedin.com/in/jamieterrell/";
 ---
 
-<PageLayout
-  title={frontmatter.title}
-  cover={frontmatter.cover}
-  subclass={frontmatter.subclass}
+<Layout
+  title={`${about.data.title} | ${config.site.title}`}
+  description={about.data.description}
+  ogImage={about.data.ogImage}
+  canonicalURL={about.data.canonicalURL}
 >
-  <Content />
-</PageLayout>
+  <Header />
+
+  <Breadcrumb />
+
+  <Main pageTitle={about.data.title} class="app-prose">
+    <Content />
+
+    <section id="certifications" class="not-prose mt-12 scroll-mt-8">
+      <h2 class="font-accent text-2xl font-semibold">Certifications</h2>
+      <p class="mt-2 mb-6">
+        A selection of Nutanix and Citrix credentials, newest first. A linked
+        name opens its Credly badge.
+      </p>
+      {
+        certifications.length === 0 ? (
+          <p>No certification entries found.</p>
+        ) : (
+          <ul class="grid gap-4">
+            {certifications.map(entry => (
+              <li class="border-border bg-muted/70 border p-4">
+                <h3 class="font-accent text-xl font-semibold">
+                  {entry.data.url ? (
+                    <a
+                      href={entry.data.url}
+                      class="text-accent underline decoration-dashed underline-offset-4"
+                    >
+                      {entry.data.title}
+                    </a>
+                  ) : (
+                    entry.data.title
+                  )}
+                </h3>
+                <p class="text-muted-foreground mt-1 text-sm">
+                  {entry.data.issuer}
+                  {entry.data.issued
+                    ? ` · ${issuedLabel(entry.data.issued)}`
+                    : ""}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+      <p class="mt-6">
+        <a
+          href={linkedInUrl}
+          class="text-accent underline decoration-dashed underline-offset-4"
+        >
+          Full list on LinkedIn
+        </a>
+      </p>
+    </section>
+  </Main>
+
+  <Footer />
+</Layout>

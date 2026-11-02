@@ -1,0 +1,137 @@
+---
+type Level = "beginner" | "intermediate" | "advanced";
+type Variant = "card" | "post";
+type Part = "badges" | "notes";
+
+type Props = {
+  variant: Variant;
+  part?: Part;
+  level?: Level;
+  topic?: string;
+  prerequisites?: string[];
+  objectives?: string[];
+  est_minutes?: number;
+  updated?: Date;
+};
+
+const {
+  variant,
+  part = "badges",
+  level,
+  topic,
+  prerequisites = [],
+  objectives = [],
+  est_minutes,
+  updated,
+} = Astro.props;
+
+function levelLabel(value: Level): string {
+  switch (value) {
+    case "beginner":
+      return "Beginner";
+    case "intermediate":
+      return "Intermediate";
+    case "advanced":
+      return "Advanced";
+    default: {
+      const exhaustive: never = value;
+      return exhaustive;
+    }
+  }
+}
+
+const label = level ? levelLabel(level) : undefined;
+
+const updatedLabel = updated
+  ? new Intl.DateTimeFormat("en", {
+      dateStyle: "medium",
+      timeZone: "UTC",
+    }).format(updated)
+  : undefined;
+
+const showBadges = part === "badges" && Boolean(label || topic);
+const showNotes =
+  part === "notes" &&
+  variant === "post" &&
+  (prerequisites.length > 0 ||
+    objectives.length > 0 ||
+    est_minutes !== undefined ||
+    updated !== undefined);
+---
+
+{
+  showBadges && (
+    <ul class="my-2 flex flex-wrap gap-2" aria-label="Post level and topic">
+      {label && (
+        <li>
+          <span class="border-accent/60 bg-muted text-foreground font-accent inline-block rounded-sm border px-2 py-0.5 text-xs font-semibold tracking-wide uppercase">
+            {label}
+          </span>
+        </li>
+      )}
+      {topic && (
+        <li>
+          <span class="border-border text-accent font-accent bg-background inline-block rounded-sm border px-2 py-0.5 text-xs font-medium">
+            {topic}
+          </span>
+        </li>
+      )}
+    </ul>
+  )
+}
+
+{
+  showNotes && (
+    <section
+      aria-labelledby="before-you-start-heading"
+      class="border-border bg-muted/70 my-6 border p-4"
+    >
+      <h2
+        id="before-you-start-heading"
+        class="font-accent text-sm font-semibold tracking-wide uppercase"
+      >
+        Before you start
+      </h2>
+      <dl class="mt-3 space-y-3 text-sm">
+        {est_minutes !== undefined && (
+          <div>
+            <dt class="font-medium">Estimated time</dt>
+            <dd>{est_minutes} minutes</dd>
+          </div>
+        )}
+        {updatedLabel && updated && (
+          <div>
+            <dt class="font-medium">Updated</dt>
+            <dd>
+              <time datetime={updated.toISOString()}>{updatedLabel}</time>
+            </dd>
+          </div>
+        )}
+        {prerequisites.length > 0 && (
+          <div>
+            <dt class="font-medium">Prerequisites</dt>
+            <dd>
+              <ul class="list-disc ps-5">
+                {prerequisites.map(item => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </dd>
+          </div>
+        )}
+        {objectives.length > 0 && (
+          <div>
+            <dt class="font-medium">Objectives</dt>
+            <dd>
+              <ul class="list-disc ps-5">
+                {objectives.map(item => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </dd>
+          </div>
+        )}
+      </dl>
+    </section>
+  )
+}
