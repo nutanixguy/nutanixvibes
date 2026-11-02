@@ -23,7 +23,8 @@ flowchart TD
     about["src/content/pages/about.md"]
     certs["src/content/certifications/*.yaml"]
     siteConfig["astro-paper.config.ts"]
-    images["public/assets/images/"]
+    imageMasters["src/assets/images/*.webp"]
+    publicFiles["public/ including og.jpg"]
   end
 
   subgraph build [npm run build]
@@ -49,6 +50,8 @@ flowchart TD
 
 The certification YAML is not its own page. `src/pages/about.astro` renders it at `/about#certifications`. `src/pages/certifications.astro` is a meta refresh to that anchor.
 
+The home hero, Jamie's logo, and the two post covers are WebP files in `src/assets/images/`. `astro build` runs them through Astro's Sharp image service and writes the sized files under `dist/_astro/`. `public/og.jpg` is still copied as-is. It is the site-wide fallback OG image (`astro-paper.config.ts` `site.ogImage`, resolved by `src/utils/resolveDefaultOgImagePath.ts`).
+
 ## 3. Codebase map
 
 | Path | What it is |
@@ -60,7 +63,7 @@ The certification YAML is not its own page. `src/pages/about.astro` renders it a
 | `src/content.config.ts` | Schema for posts, pages, and the certifications collection. Same role as a validated object schema in a Desired State config. |
 | `src/content/posts/` | The two migrated posts. |
 | `src/content/pages/about.md` | About page prose. Same text as the old `src/data/about.md` on `main`. |
-| `src/pages/about.astro` | Renders that prose, then the certifications section at `#certifications`. |
+| `src/pages/about.astro` | Renders that prose, then the certifications section at `#certifications`. Jamie's logo is the profile image under the heading. |
 | `src/content/certifications/` | Curated Nutanix and Citrix credentials from Jamie's LinkedIn, read 1 Nov 2026. No expiry dates. |
 | `src/pages/certifications.astro` | Static redirect to `/about#certifications`. Not a content page. |
 | `src/pages/[...slug]/` | One post page per file in `src/content/posts/`, served at `/{slug}/`. |
@@ -72,7 +75,9 @@ The certification YAML is not its own page. `src/pages/about.astro` renders it a
 | `src/styles/theme.css` | Colors. Dark is the default on `:root`. Light is `[data-theme="light"]`. Hex values are cited in section 5. |
 | `src/styles/global.css` | Grid background and the scanline overlay. |
 | `src/pages/search.astro` | Pagefind UI. No Algolia. |
-| `public/assets/images/` | Cover images kept from the Casper site. |
+| `src/assets/images/` | WebP masters for the home hero, Jamie's logo, and the two post covers. Encoded at quality 90. Astro resizes them at build time. |
+| `src/assets/site-images.ts` | Imports the hero and the logo, and holds the alt text the home and about pages share. |
+| `public/assets/images/` | Older files still copied as-is: `about-hero.jpg` and `cropped-image.jpg`. The two previous post covers were removed on 2 Nov 2026. |
 | `public/og.jpg` | Copy of `public/assets/images/about-hero.jpg`. The theme only accepts a single filename in `public/` for the site OG image (`src/utils/resolveDefaultOgImagePath.ts`). |
 | `public/CNAME` | Untouched. Still `nutanixvibes.com`. |
 | `.github/workflows/deploy.yml` | Untouched. See section 5. |
@@ -96,6 +101,8 @@ Old Casper files are gone on this branch, including `src/components/AlgoliaSearc
 Fonts: Google Sans Code is the body font (the theme default). JetBrains Mono is the accent font for the site title, nav, headings, and badges (`--font-accent` in `src/styles/theme.css`, loaded in `src/layouts/Layout.astro`). The build log copied 28 font files. Those files are downloaded at build time by Astro's Google font provider. An offline build was not tested.
 
 There is no app server, no database, and no client-side content API.
+
+Sharp (`sharp` `^0.35.5` in `package.json`) was already a dependency. Astro's image service uses it. This image change did not add a package.
 
 ## 5. Decisions log
 
@@ -215,11 +222,37 @@ The standalone certifications page is gone from the nav. `src/pages/about.astro`
 | Casper field | AstroPaper field |
 | --- | --- |
 | `date` | `pubDatetime` |
-| `cover` | `ogImage` (root-relative path under `/assets/images/`) |
+| `cover` | `ogImage`. These two posts now use a path relative to the markdown file, under `src/assets/images/`. A root-relative `/...` path still means a file in `public/` and is not resized. |
 | `class`, `subclass`, `current`, `navigation`, `disqus` | removed |
-| body and cover files | kept |
+| body and cover files | Body kept. The cover files from that migration were replaced on 2 Nov 2026. |
 
-New optional fields, all set on both posts: `level`, `topic`, `prerequisites`, `objectives`, `est_minutes`, `quest_id`, `updated`.
+New optional fields, all set on both posts: `level`, `topic`, `prerequisites`, `objectives`, `est_minutes`, `quest_id`, `updated`. `ogImageAlt` was added on 2 Nov 2026 and is set on both posts.
+
+### Post covers, hero, and logo (2 Nov 2026)
+
+The attached PNGs were encoded to WebP quality 90 with Sharp (`effort: 6`) and committed under `src/assets/images/`. Astro then emits smaller WebP files at the widths the templates ask for. Photo-style images use `<Image quality={80}>`. The logo uses `quality={85}` because it is flat color and line art.
+
+| Master in `src/assets/images/` | Pixels | Bytes |
+| --- | --- | --- |
+| `hero.webp` | 1920×720 | 85474 |
+| `jamie-logo.webp` | 1536×1024 | 142348 |
+| `post-nutanix-7-5-just-dropped-heres-what-actually-matters.webp` | 1200×630 | 81764 |
+| `post-prism-central-tip-use-the-view-by-dropdown-for-faster-vm-audits.webp` | 1200×630 | 82890 |
+
+`src/pages/index.astro` puts the hero in a `max-w-6xl` band, the same width as the header. From the `sm` breakpoint (40rem) up, the title and the tagline `Good Vibes, Great Infrastructure` sit in the left 44% of that image. Below 40rem they sit on a solid band under the image. The band color is `#01061d`, the bottom-left pixel of the 640px built hero (`dist/_astro/hero.BiJryBXk_2teTWJ.webp` in the 2 Nov 2026 build). White `#ffffff` on that navy is 20.09:1. Light-theme body text `#131313` on it is 1.08:1, so the overlay does not use the theme foreground color. `src/styles/theme.css` was not edited. The RSS icon on the banner is `stroke-white`.
+
+The same logo file is the small image beside the home intro (`width={288}`, displayed at `w-24` / `sm:w-32`) and the about-page profile image (`width={512}`, displayed at `w-48` / `sm:w-64`). Alt text for both is in `src/assets/site-images.ts`.
+
+Each post's `ogImage` is a relative path. `src/content.config.ts` already sends relative paths through Astro's `image()` helper. `src/pages/[...slug]/index.astro` renders that result with `<Image>` and also calls `getImage()` at width 1200, WebP, quality 80, for `og:image`. `ogImageAlt` is the cover `alt`, `og:image:alt`, and `twitter:image:alt` (`src/layouts/Layout.astro`). The post slugs were not edited. Built canonicals are still:
+
+- `https://nutanixvibes.com/nutanix-7-5-just-dropped-heres-what-actually-matters/`
+- `https://nutanixvibes.com/prism-central-tip-use-the-view-by-dropdown-for-faster-vm-audits/`
+
+The largest delivered hero in that build was 50514 bytes (1920w). The 1200w post covers were 49848 and 52016 bytes. The home logo was 10690 bytes and the about logo was 23432 bytes.
+
+The old files `public/assets/images/nutanix-7-5-hero.png` and `public/assets/images/prism-central-view-by-hero.png` are deleted. `file` on the first one reported a WebP payload inside a `.png` name. Nothing else in the repo referenced them. `public/og.jpg` and `public/assets/images/about-hero.jpg` are unchanged. The home page and the about page still use `og.jpg` as their share image. I did not point those pages at the new art.
+
+I rejected leaving the PNGs in `public/` and serving them unchanged. That matches the old cover path, and it skips the resize step. I also rejected committing the original PNGs (about 4.6MB together) and letting Astro be the only encoder. Quality-90 WebP masters are the sources in git. The pipeline still does the responsive sizes.
 
 ## 6. How to run and test
 
@@ -266,7 +299,29 @@ Run on this branch in this environment, after `npm ci`:
 
 Not part of that smoke test: keyboard-only navigation, a screen reader, a phone viewport, `npm run dev` (preview was the production build), the WordPress importer, and a real GitHub Pages deploy.
 
+### Smoke test for the images (2 Nov 2026)
+
+Same machine, Node `v22.23.4`, after the image edits. `npm ci` had already completed earlier in this session (578 packages).
+
+1. `npm run format:check` passed.
+2. `npm run lint` passed (exit 0, no findings).
+3. `npm run build` passed. `astro check` reported 0 errors, 0 warnings, 0 hints. Astro 7.4.4 wrote 17 pages. Pagefind indexed 2 pages and 520 words. The image step emitted 12 WebP files under `dist/_astro/`.
+4. `npm run preview` was already serving `http://127.0.0.1:4321/` and picked up the new `dist/`.
+5. Headless Chrome opened `/`, `/about/`, `/nutanix-7-5-just-dropped-heres-what-actually-matters/`, and `/prism-central-tip-use-the-view-by-dropdown-for-faster-vm-audits/` at 1280px, dark and light. Each image `complete` flag was true. On `/`, the hero `h1` computed color was `rgb(255, 255, 255)` in both themes. Below 40rem the hero copy background computed as `rgb(1, 6, 29)`.
+6. The same home page was also opened at 390, 640, and 768px. At 390 the title is on the navy band under the picture. At 640 and 768 the title wraps inside the left side of the picture and does not cover the racks. About was also opened at 390px dark.
+7. Built HTML for both posts has `og:image` pointing at the 1200w WebP under `https://nutanixvibes.com/_astro/`, plus `og:image:alt`.
+
+Screenshots from this pass are under `/opt/cursor/artifacts/`: `screenshot_home_before_dark.png`, `screenshot_home_after_dark.png`, `screenshot_home_after_light.png`, `screenshot_home_after_mobile_dark.png`, `screenshot_about_before_dark.png`, `screenshot_about_after_dark.png`, `screenshot_about_after_light.png`, `screenshot_post_75_before_dark.png`, `screenshot_post_75_after_dark.png`, `screenshot_post_75_after_light.png`.
+
+Not part of this pass: keyboard-only navigation, a screen reader, an axe scan, a physical phone, LinkedIn or X's share debugger, and a GitHub Pages deploy.
+
 ## 7. Lessons learned
+
+The post template only drew a cover when `ogImage` was a root-relative string (`src/pages/[...slug]/index.astro`, the `coverSrc` check). A relative path still becomes image metadata, and the old code already copied `.src` into the `og:image` meta tag. If I had only edited the frontmatter, the share image would have changed and the page would have shown no picture. The template now renders metadata with `<Image>` and keeps the string branch for a file in `public/`.
+
+Light-theme text cannot sit on this hero. I sampled the 640px built hero and got `#01061d` at the bottom left. `#131313` on that is 1.08:1. The overlay is `#ffffff` (20.09:1) in both themes. The first version I considered used the theme foreground color. That would have passed in dark mode and failed in light mode.
+
+`public/assets/images/nutanix-7-5-hero.png` was not a PNG. `file` reported a WebP payload. The extension was not a safe signal for the format visitors downloaded. The new files are WebP masters, and the tags Astro emits are WebP too.
 
 `npm install` and `npm ci` did not agree until the lockfile was pinned. `@astrojs/mdx@7.0.8` has an optional peer on `@astrojs/markdown-satteri@^0.3.1`. That range does not include 0.4.x. Astro 7.4.4 depends on `@astrojs/markdown-satteri@0.4.6`. npm 10.9.9's `npm ci` tried to place 0.3.8 next to 0.4.6 and rejected the lock. `npm install` had accepted it. The override in `package.json` forces 0.4.6. After that, `npm ci` succeeded. pnpm, which upstream AstroPaper uses, did not have this problem. This repo uses npm because the task asked for `npm ci`.
 
@@ -280,7 +335,7 @@ I compared `.github/workflows/deploy.yml` with this branch and did not edit it. 
 
 ## 8. Open questions and known gaps
 
-- Merging this branch would change production. `deploy.yml` on `main` would build this tree and deploy it. That deploy was not run. This PR is a draft and should not be merged.
+- Merging this branch would change production. `deploy.yml` on `main` would build this tree and deploy it. That deploy was not run. Do not merge unless that deploy is what you want.
 - Post URLs match `main` again (`/{slug}/`). The Casper tag, author, and feed URLs redirect as listed in section 5. A GitHub Pages deploy of this branch was not run, so the directory-style redirect pages (`feed.xml/index.html` and the rest) were checked with `astro preview`, not on Pages itself.
 - `America/New_York` may be wrong if "Georgia" in the about page is not the US state.
 - `updated` duplicates the publish timestamp. There is no evidence the posts were revised later.
@@ -290,7 +345,9 @@ I compared `.github/workflows/deploy.yml` with this branch and did not edit it. 
 - `scripts/import-wordpress.py` still targets `src/content/blog` and writes `pubDate` plus `categories`. Running it would not produce valid AstroPaper posts. Not run.
 - Search does not include the new pages. Add `data-pagefind-body` on those pages if they should be searchable.
 - The theme's OS theme-change listener can leave dark mode. Not tested.
-- No axe scan, no screen reader, no mobile viewport check. Desktop 1280 dark and light were screenshotted.
+- No axe scan and no screen reader pass. The image work was opened at 390, 640, 768, and 1280px in headless Chrome. That is not a physical phone. The earlier desktop-only note above is about the color pass, not this image pass.
+- The home page and the about page still share `public/og.jpg`. The new hero and the logo are not their `og:image`. A share-card debugger was not run.
+- `cropped-image.jpg` in `public/assets/images/` is still unused by the templates. I did not delete it.
 - `features.dynamicOgImage` is still on. Posts that set `ogImage` skip the generated PNG (`src/pages/[...slug]/index.png.ts`). `/og.png` is still generated for the site fallback. A post with no `ogImage` was not tested.
 - Font download needs network at build time. An offline build was not tested.
 - Upstream AstroPaper CI (pnpm, Node 24) was not added. This branch has no PR lint workflow of its own. Lint was run locally.
