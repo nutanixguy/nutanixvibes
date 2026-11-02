@@ -32,7 +32,7 @@ npm run preview
 - About page: `src/content/pages/about.md`
 - Example certifications: `src/content/certifications/`
 - Site config: `astro-paper.config.ts`
-- Images: `public/assets/images/`
+- Images: optimized sources in `src/assets/images/` (Astro image pipeline). Site fallback OG image: `public/og.jpg`.
 
 ## License
 

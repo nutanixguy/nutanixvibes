@@ -40,7 +40,7 @@ Run it in three passes: before the merge to `main`, at the deploy, and in the fi
 - [ ] Each indexable page has its own title, description, and one H1. Post titles and descriptions are the frontmatter in `src/content/posts/`.
 - [ ] Canonical URLs use `https://nutanixvibes.com`, including the two post URLs above. The tag is written in `src/layouts/Layout.astro`.
 - [ ] `robots.txt` allows crawling and points at the sitemap. It does not set `noindex` for the site. Redirect pages are `noindex`. Confirm the production HTML is not `noindex` either.
-- [ ] Share one post URL and confirm the title, description, and image. Post images are the `ogImage` files under `public/assets/images/`. The site fallback is `public/og.jpg`. This preview did not load the LinkedIn or X share debugger.
+- [ ] Share one post URL and confirm the title, description, and image. Post covers are the `ogImage` files under `src/assets/images/`, emitted as WebP. The site fallback is `public/og.jpg`. This preview did not load the LinkedIn or X share debugger.
 - [ ] There is no privacy or terms page in this repo. Decide whether a personal blog needs one before launch. Do not invent a policy page in the same breath as the merge.
 
 ## At the switch

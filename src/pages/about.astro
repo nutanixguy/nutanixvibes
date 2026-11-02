@@ -1,5 +1,7 @@
 ---
+import { Image } from "astro:assets";
 import { getCollection, getEntry, render } from "astro:content";
+import { jamieLogoAlt, jamieLogoImage } from "@/assets/site-images";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Breadcrumb from "@/components/Breadcrumb.astro";
@@ -44,6 +46,15 @@ const linkedInUrl = "https://www.linkedin.com/in/jamieterrell/";
   <Breadcrumb />
 
   <Main pageTitle={about.data.title} class="app-prose">
+    <Image
+      src={jamieLogoImage}
+      alt={jamieLogoAlt}
+      width={512}
+      format="webp"
+      quality={85}
+      priority
+      class="border-border not-prose mx-auto mb-6 block h-auto w-48 rounded-sm border sm:w-64"
+    />
     <Content />
 
     <section id="certifications" class="not-prose mt-12 scroll-mt-8">

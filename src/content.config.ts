@@ -25,6 +25,8 @@ const posts = defineCollection({
         })
         .or(image())
         .optional(),
+      // Cover alt, also og:image:alt. The post page falls back to the title.
+      ogImageAlt: z.string().min(1).optional(),
       description: z.string(),
       canonicalURL: z.string().optional(),
       hideEditPost: z.boolean().optional(),

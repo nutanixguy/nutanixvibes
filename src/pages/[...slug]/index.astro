@@ -1,4 +1,5 @@
 ---
+import { Image, getImage } from "astro:assets";
 import { type CollectionEntry, getCollection, render } from "astro:content";
 import PostLayout from "@/layouts/PostLayout.astro";
 import Header from "@/components/Header.astro";
@@ -73,6 +74,7 @@ const {
   title,
   description,
   ogImage: initOgImage,
+  ogImageAlt,
   canonicalURL,
   pubDatetime,
   modDatetime,
@@ -89,12 +91,26 @@ const {
 
 const { Content } = await render(post);
 
+const coverAlt = ogImageAlt ?? title;
+const coverImage =
+  initOgImage && typeof initOgImage !== "string" ? initOgImage : undefined;
+
 let ogImageUrl: string | undefined;
 
-if (typeof initOgImage === "string") {
+if (coverImage) {
+  const optimized = await getImage({
+    src: coverImage,
+    width: Math.min(coverImage.width, 1200),
+    format: "webp",
+    quality: 80,
+  });
+  ogImageUrl = optimized.src;
+} else if (typeof initOgImage === "string" && initOgImage.startsWith("/")) {
   ogImageUrl = initOgImage;
-} else if (initOgImage?.src) {
-  ogImageUrl = initOgImage.src;
+} else if (typeof initOgImage === "string") {
+  throw new Error(
+    `Post ${post.id} ogImage was not turned into an optimized image (${initOgImage}).`
+  );
 }
 
 if (!ogImageUrl && config.features.dynamicOgImage) {
@@ -113,12 +129,21 @@ const coverSrc =
   typeof initOgImage === "string" && initOgImage.startsWith("/")
     ? initOgImage
     : undefined;
+
+const coverWidth = coverImage?.width ?? 0;
+const coverWidths = coverImage
+  ? [640, 960, coverWidth].filter(
+      (width, index, widths) =>
+        width <= coverWidth && widths.indexOf(width) === index
+    )
+  : [];
 ---
 
 <PostLayout
   title={`${title} | ${config.site.title}`}
   description={description}
   ogImage={ogImage}
+  ogImageAlt={ogImageUrl ? coverAlt : undefined}
   canonicalURL={canonicalURL}
   pubDatetime={pubDatetime}
   modDatetime={modDatetime}
@@ -166,12 +191,24 @@ const coverSrc =
     />
 
     {
-      coverSrc && (
-        <img
-          src={coverSrc}
-          alt=""
-          class="border-border mt-6 w-full rounded-sm border"
+      coverImage ? (
+        <Image
+          src={coverImage}
+          alt={coverAlt}
+          widths={coverWidths}
+          sizes="(min-width: 48rem) 46rem, 100vw"
+          format="webp"
+          quality={80}
+          class="border-border mt-6 h-auto w-full rounded-sm border"
         />
+      ) : (
+        coverSrc && (
+          <img
+            src={coverSrc}
+            alt={coverAlt}
+            class="border-border mt-6 h-auto w-full rounded-sm border"
+          />
+        )
       )
     }
 

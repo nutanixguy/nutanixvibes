@@ -1,7 +1,8 @@
 ---
 title: "Nutanix 7.5 Just Dropped – Here's What Actually Matters"
 description: "So Nutanix pushed out AOS 7.5, AHV 11, and Prism Central 7.5 back in December, and honestly? There's some good stuff in here."
-ogImage: /assets/images/nutanix-7-5-hero.png
+ogImage: ../../assets/images/post-nutanix-7-5-just-dropped-heres-what-actually-matters.webp
+ogImageAlt: "Server nodes on a platform sending a stream of light toward floating cubes marked with a processor, a gear, a shield, and stacked disks."
 pubDatetime: 2026-01-30T12:00:00.000Z
 updated: 2026-01-30T12:00:00.000Z
 author: Jamie Terrell
