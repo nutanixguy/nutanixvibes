@@ -61,10 +61,14 @@ const certifications = defineCollection({
   schema: z.object({
     title: z.string(),
     issuer: z.string(),
-    label: z.literal("EXAMPLE"),
-    credentialId: z.string(),
-    issued: z.string(),
-    summary: z.string(),
+    // YYYY-MM. Omitted when LinkedIn has no issue date.
+    issued: z
+      .string()
+      .regex(/^\d{4}-\d{2}$/)
+      .optional(),
+    // Newest first. Same-month ties use a suffix, for example 2024-12-02.
+    sortKey: z.string(),
+    url: z.url().optional(),
   }),
 });
 

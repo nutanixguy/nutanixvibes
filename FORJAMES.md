@@ -61,7 +61,7 @@ The certification YAML is not its own page. `src/pages/about.astro` renders it a
 | `src/content/posts/` | The two migrated posts. |
 | `src/content/pages/about.md` | About page prose. Same text as the old `src/data/about.md` on `main`. |
 | `src/pages/about.astro` | Renders that prose, then the certifications section at `#certifications`. |
-| `src/content/certifications/` | Two fake YAML entries. The schema requires `label: EXAMPLE`. |
+| `src/content/certifications/` | Curated Nutanix and Citrix credentials from Jamie's LinkedIn, read 1 Nov 2026. No expiry dates. |
 | `src/pages/certifications.astro` | Static redirect to `/about#certifications`. Not a content page. |
 | `src/pages/[...slug]/` | One post page per file in `src/content/posts/`, served at `/{slug}/`. |
 | `src/pages/` | Other routes. A file here becomes a URL. `src/pages/quest.astro` is `/quest`. The posts list stays at `/posts/`. |
@@ -185,7 +185,7 @@ Preview on `127.0.0.1:4321` returned HTTP 200 for `/feed.xml` (refresh to `/rss.
 
 ### Launch checklist
 
-`docs/LAUNCH-CHECKLIST.md` is a one-time list for the relaunch. It is not routed from `src/pages/`, so `npm run build` does not publish it. It adapts the pre-launch site checks and the owned, rented, and borrowed channel split from Corey Haines's launch skill (`coreyhaines31/marketingskills`, MIT, copyright 2025). The file credits that skill. It does not include the skill's Product Hunt steps or its affiliate link. The checks name this repo's files: `public/CNAME`, the two `/{slug}/` posts, `/rss.xml`, Pagefind, dark and light, the EXAMPLE cards in `src/content/certifications/`, and the `/github-stats` placeholder. The channel list is the LinkedIn and X URLs in `astro-paper.config.ts`, the Nutanix community Jamie already uses, and the GitHub profile README for `nutanixguy`, which is a different repo. No traffic or follower numbers are stated, because this repo has none.
+`docs/LAUNCH-CHECKLIST.md` is a one-time list for the relaunch. It is not routed from `src/pages/`, so `npm run build` does not publish it. It adapts the pre-launch site checks and the owned, rented, and borrowed channel split from Corey Haines's launch skill (`coreyhaines31/marketingskills`, MIT, copyright 2025). The file credits that skill. It does not include the skill's Product Hunt steps or its affiliate link. The checks name this repo's files: `public/CNAME`, the two `/{slug}/` posts, `/rss.xml`, Pagefind, dark and light, the curated cards in `src/content/certifications/`, and the `/github-stats` placeholder. The channel list is the LinkedIn and X URLs in `astro-paper.config.ts`, the Nutanix community Jamie already uses, and the GitHub profile README for `nutanixguy`, which is a different repo. No traffic or follower numbers are stated, because this repo has none.
 
 ### Quest id stays in the data and off the post
 
@@ -193,7 +193,7 @@ Preview on `127.0.0.1:4321` returned HTTP 200 for `/feed.xml` (refresh to `/rss.
 
 ### Certifications live on About
 
-The standalone certifications page is gone from the nav. The same two YAML files still feed a section on the About page, `src/pages/about.astro`, at `/about#certifications`. `src/pages/certifications.astro` is a noindex meta refresh to that anchor. Chrome followed `http://127.0.0.1:4321/certifications/` to `http://127.0.0.1:4321/about#certifications` and the section was on the page. The sitemap filter in `astro.config.ts` drops `/certifications`. The cards are still labeled EXAMPLE.
+The standalone certifications page is gone from the nav. `src/pages/about.astro` renders `src/content/certifications/` at `/about#certifications`, newest first. The nine entries are the curated set from Jamie's LinkedIn profile, read 1 Nov 2026: the Nutanix 7 Business Continuity and Network & Security credentials, NCP-MCI 6 (Credly `8b2e7d71`), NCA 6 (Credly `02deabff`), one combined Nutanix Technology Champion 2023-2026 entry linked to the 2026 badge, NCM 5, NCP End User Computing, Citrix CC-VAD-CC, and CCE-V with no date and no link. Expiry dates are not stored or shown. A "Full list on LinkedIn" link points at `https://www.linkedin.com/in/jamieterrell/`. `src/pages/certifications.astro` is still a noindex meta refresh to that anchor. The sitemap filter in `astro.config.ts` drops `/certifications`.
 
 ### Other choices
 
@@ -205,7 +205,7 @@ The standalone certifications page is gone from the nav. The same two YAML files
 - Level `beginner` on the View by post: it is a Prism Central UI tip. Level `intermediate` on the 7.5 post: it assumes CVM, CCLM, NGT, and protection policies.
 - Timezone `America/New_York` is an assumption. The about page says "Based in Georgia." The removed author file on `main` (`src/content/authors/jamie.json`) said "Georgia, USA". If that Georgia is the country, this timezone is wrong.
 - `features.editPost.enabled` is false. The theme default pointed at `github.com/satnaing/astro-paper`.
-- Certifications are fake on purpose. `src/content.config.ts` only accepts `label: EXAMPLE`. Real credential names remain prose in `src/content/pages/about.md`. They are not loaded as data. The cards render under that prose, at `#certifications`.
+- The About certification cards are the curated LinkedIn set in `src/content/certifications/`. Older and expired credentials from that same LinkedIn read are not in the YAML. The About prose still mentions a broader set in passing.
 - `/quest` is a coming-soon page and is not in the nav. Start here and GitHub stats are.
 - `package.json` overrides `@astrojs/markdown-satteri` to `0.4.6`. See section 7.
 - AstroPaper's own `.github/workflows/ci.yml` uses pnpm and runs on pull requests. It was not copied. The template has no deploy workflow, so there was nothing to delete. This branch's only workflow is the original `deploy.yml`.
@@ -261,7 +261,7 @@ Run on this branch in this environment, after `npm ci`:
    - `/about/` (the certifications section was in the document)
    - `/search/`
 8. On `/search/`, the Pagefind box accepted `prism` and showed 2 results.
-9. `/certifications/` followed its meta refresh to `/about#certifications`. The section was present and two EXAMPLE labels were visible.
+9. `/certifications/` followed its meta refresh to `/about#certifications`.
 10. Full-page screenshots for this pass, dark and light, are `screenshot_brand_home_*.png`, `screenshot_brand_post_*.png`, `screenshot_brand_about_*.png`, and `screenshot_brand_search_*.png` under `/opt/cursor/artifacts/`.
 
 Not part of that smoke test: keyboard-only navigation, a screen reader, a phone viewport, `npm run dev` (preview was the production build), the WordPress importer, and a real GitHub Pages deploy.

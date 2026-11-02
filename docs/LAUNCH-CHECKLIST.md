@@ -32,7 +32,7 @@ Run it in three passes: before the merge to `main`, at the deploy, and in the fi
 
 - [ ] Home, one post, About, and search in dark mode and in light mode. Dark is the default (`src/layouts/Layout.astro`).
 - [ ] The same four pages on a phone-width browser. Desktop screenshots at 1280 were taken for this preview. A phone pass was not.
-- [ ] Replace or remove the EXAMPLE certification cards before launch. They are `src/content/certifications/example-0001.yaml` and `example-0002.yaml`, rendered at `/about#certifications`. The schema only accepts `label: EXAMPLE` until that schema is changed. Do not leave the fictional cards on the public About page.
+- [ ] Read `/about#certifications` and confirm the curated Nutanix and Citrix list is what should be public. The entries are YAML in `src/content/certifications/`, taken from LinkedIn on 1 Nov 2026. Expiry dates are not shown.
 - [ ] Decide what `/github-stats` should do. The page is a placeholder: every value is "Not fetched", and the nav still links to it. Either remove that nav link or keep the honest placeholder. Do not type in numbers by hand.
 
 ### SEO and social images
@@ -49,7 +49,7 @@ Run it in three passes: before the merge to `main`, at the deploy, and in the fi
 - [ ] When the Pages deploy is green, request the two post URLs, `/rss.xml`, `/feed.xml`, `/about#certifications`, and `/search` on the public host. You want 200 for the posts, RSS, About, and search, and a refresh on `/feed.xml`.
 - [ ] Confirm `https://nutanixvibes.com` serves the new HTML over HTTPS. This repo does not record whether `www` redirects to the apex.
 - [ ] Open `/search?q=prism` on the public host, not only in preview.
-- [ ] Read the About page on the public host and confirm the EXAMPLE cards are gone.
+- [ ] Read the About page on the public host and confirm the curated certification list is the one you expect.
 
 ## The first two weeks
 
