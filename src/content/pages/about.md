@@ -1,5 +1,5 @@
 ---
-title: About
+title: About me
 description: "Jamie Terrell, infrastructure engineer. Nutanix, Citrix, Azure, and the problems worth writing down."
 ---
 
