@@ -2,75 +2,81 @@
 # Add a peer by copying one item. `id` is the sort order and is not shown.
 # Leave `author` out unless that site states the name. Do not guess one.
 - id: "01"
+  name: Jeroen Tielen
+  url: https://www.jeroentielen.nl/
+  author: Jeroen Tielen
+  language: EN
+  focus: Hands-on guides, scripts and field notes on Nutanix, Citrix and other EUC products.
+- id: "02"
   name: Thoughts and Ramblings by Mike
   url: https://mikedent.io/
   author: Mike Dent
   language: EN
   focus: Prism Central backup and recovery, AOS upgrades, Windows guest customization, and data protection.
-- id: "02"
+- id: "03"
   name: Gael V
   url: https://medium.com/@gvenin
   author: Gael V
   language: EN
   focus: NKP upgrades, NDK, Nutanix disaster recovery, HCI monitoring, and some network automation.
-- id: "03"
+- id: "04"
   name: NutaNice Xperience
   url: https://tomomartin.hateblo.jp/
   language: JP
   focus: Japanese lab notes on expanding AHV clusters, Witness VMs, and Nutanix Disaster Recovery.
-- id: "04"
+- id: "05"
   name: en.vmik.net
   url: https://en.vmik.net/
   author: vmik
   language: EN
   focus: Nutanix AOS and Prism Central releases, plus Veeam backups of Nutanix and other lab fixes.
-- id: "05"
+- id: "06"
   name: Nutanix Self-Service (calm)
   url: https://nutanixcalm.wordpress.com/
   author: Avi Coren
   language: EN
   focus: Calm blueprints and runbooks, with PowerShell, Python, and shell as the building blocks.
-- id: "06"
+- id: "07"
   name: Julien Dumur
   url: https://juliendumur.fr/en/
   author: Julien Dumur
   language: EN
   focus: English translations of his French notes on Nutanix, HYCU, Move, AHV, and the homelab.
-- id: "07"
+- id: "08"
   name: 不自量力 の Weithenn
   url: https://www.weithenn.org/
   author: Wei-Ren Wang
   language: TW
   focus: Traditional Chinese notes on Nutanix Flow and NUMA, plus vSphere, Hyper-V, and Kubernetes.
-- id: "08"
+- id: "09"
   name: Just A Server Engineer
   url: https://justaserverengineer.blogspot.com/
   language: EN
   focus: Nutanix commands, NDB upgrades, and notes from running Nutanix on Dell servers.
-- id: "09"
+- id: "10"
   name: Itskimpossible!
   url: https://itskimpossible.blog/
   author: Kim Mount
   language: EN
   focus: Nutanix EUC, NC2 on Azure, AVD with Nerdio on AHV, and partner field notes.
-- id: "10"
+- id: "11"
   name: Donders.IT
   url: https://blog.donders.it/
   author: Bart Donders
   language: EN
   focus: Nutanix Files, Prism Central, VM startup policies, Linux backups, and .NEXT notes.
-- id: "11"
+- id: "12"
   name: Jonas Blog
   url: https://jonashogman.com/
   author: Jonas Högman
   language: EN
   focus: Prism Central operations, the Nutanix API, CSI upgrades, and Ansible automation.
-- id: "12"
+- id: "13"
   name: NTNX＞日記
   url: https://blog.ntnx.jp/
   language: JP
   focus: A Japanese Community Edition diary, lately Nutanix Enterprise AI, NKP, and the MCP server.
-- id: "13"
+- id: "14"
   name: Sam's Tech Notes
   url: https://sl-notes.dev/
   author: Sam Larson
