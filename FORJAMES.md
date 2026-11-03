@@ -212,6 +212,12 @@ Preview on `127.0.0.1:4321` returned HTTP 200 for `/feed.xml` (refresh to `/rss.
 
 The standalone certifications page is gone from the nav. `src/pages/about.astro` renders `src/content/certifications/` at `/about#certifications`, newest first. The nine entries are the curated set from Jamie's LinkedIn profile, read 1 Nov 2026: the Nutanix 7 Business Continuity and Network & Security credentials, NCP-MCI 6 (Credly `8b2e7d71`), NCA 6 (Credly `02deabff`), one combined Nutanix Technology Champion 2023-2026 entry linked to the 2026 badge, NCM 5, NCP End User Computing, Citrix CC-VAD-CC, and CCE-V with no date and no link. Expiry dates are not stored or shown. A "Full list on LinkedIn" link points at `https://www.linkedin.com/in/jamieterrell/`. `src/pages/certifications.astro` is still a noindex meta refresh to that anchor. The sitemap filter in `astro.config.ts` drops `/certifications`.
 
+### The About label is "About me" (2 Nov 2026)
+
+The URL stays `/about/`. `nav.about` in `src/i18n/lang/en.ts` is "About me". That string is the header link and the breadcrumb. The `title` in `src/content/pages/about.md` is "About me", which is the h1 and the document title on `src/pages/about.astro`. `src/pages/start-here.astro` links to the same URL with the text "About me". `src/pages/certifications.astro` still redirects to `/about#certifications`. Its fallback sentence says "About me".
+
+The breadcrumb used Tailwind `capitalize`. That would render the new label as "About Me". `src/components/Breadcrumb.astro` now leaves a named nav item as written. A tag slug still gets `capitalize`.
+
 ### Other choices
 
 - Dark is the default. `src/layouts/Layout.astro` puts `data-theme="dark"` on `<html>`. The boot script stays on dark unless `localStorage` is exactly `"light"` or `"dark"`. `src/scripts/theme.ts` uses the same rule when nothing is stored. A later operating-system theme change still overwrites that choice. That listener was not exercised.
@@ -397,6 +403,14 @@ Same machine, Node `v22.23.4`. `npm ci` in this session installed 578 packages.
 A console error during that pass was `favicon.ico` 404. `src/layouts/Layout.astro` links `favicon.ico`. `public/` only has `favicon.svg`. That 404 is not from this page. I did not add an ico file.
 
 Not part of this pass: a screen reader, an axe scan, a physical phone, and a GitHub Pages deploy. Search was not expected to return this page.
+
+### Smoke test for the About me label (2 Nov 2026)
+
+Same preview, after the label edit. `npm run lint`, `npm run format:check`, and `npm run build` passed. `astro check` reported 0 errors.
+
+Headless Chrome loaded `/about/` directly. The path stayed `/about/`. The document title was `About me | Nutanix Vibes`. The h1, the nav link, and the breadcrumb text were `About me`. The breadcrumb computed `text-transform` was `none`. The nav link had the active class. `/start-here/` linked to `/about/` with the text `About me`. At 390px the menu showed `About me`. No page errors on that pass.
+
+Screenshots: `screenshot_about_me_desktop.png` and `screenshot_about_me_mobile_menu.png` under `/opt/cursor/artifacts/`.
 
 ## 7. Lessons learned
 

@@ -34,6 +34,12 @@ const navLabels: Record<string, string> = {
   "roll-call": t.nav.rollCall,
 };
 
+const crumbText = (segment: string) =>
+  navLabels[segment] ?? decodeSegment(segment);
+
+// Named items already have their casing. capitalize would turn "About me" into "About Me".
+const keepCasing = (segment: string) => segment in navLabels;
+
 // if breadcrumb is Home > Posts > [page] <etc>
 // replace Posts with localized "Posts (page number)"
 if (breadcrumbList[0] === "posts") {
@@ -74,20 +80,28 @@ if (breadcrumbList[0] === "tags" && !isNaN(Number(breadcrumbList[2]))) {
         index + 1 === breadcrumbList.length ? (
           <li>
             <span
-              class:list={["capitalize opacity-75", { lowercase: index > 0 }]}
+              class:list={[
+                "opacity-75",
+                {
+                  capitalize: !keepCasing(breadcrumb),
+                  lowercase: index > 0 && !keepCasing(breadcrumb),
+                },
+              ]}
               aria-current="page"
             >
-              {/* make the last part lowercase in Home > Tags > some-tag */}
-              {navLabels[breadcrumb] ?? decodeSegment(breadcrumb)}
+              {crumbText(breadcrumb)}
             </span>
           </li>
         ) : (
           <li class="flex items-center gap-x-1">
             <a
               href={getRelativeLocaleUrl(locale, breadcrumb)}
-              class="capitalize opacity-70"
+              class:list={[
+                "opacity-70",
+                { capitalize: !keepCasing(breadcrumb) },
+              ]}
             >
-              {navLabels[breadcrumb] ?? decodeSegment(breadcrumb)}
+              {crumbText(breadcrumb)}
             </a>
             <span aria-hidden="true" class="opacity-70">
               &raquo;
