@@ -232,6 +232,12 @@ The About Me page links to the CV at `https://cv.nutanixvibes.com/`. On 2 Nov 20
 
 The nav also has that URL, immediately before the archive icon, in `src/components/Header.astro`. The mark is `src/assets/icons/IconCv.svg`: a document outline with a C and a V drawn as strokes, same 24px grid as `IconArchive.svg`. Desktop shows the icon. The phone menu shows the word from `nav.cv` in `src/i18n/lang/en.ts`, the same pattern as Archives. The accessible name is "CV, opens in a new tab".
 
+### Tags live on Search (2 Nov 2026)
+
+Tags left the header. `src/components/Header.astro` no longer links to `/tags/`. `src/pages/search.astro` lists the same chips under the search box, using `getUniqueTags` and `src/components/Tag.astro`. Each chip still goes to `/tags/{tag}/`. `/tags/` is still a page, so a bookmark or the old Casper `/tag/{tag}/` redirect keeps working. The nav string `nav.tags` stays, because the search heading and the breadcrumb use it.
+
+Headless Chrome on the preview: the nav was Posts, About Me, Roll Call, CV, Archives, Search. `/search/` had an h2 "Tags" and six chips: AHV, CVM, NGT, Nutanix, Prism Central, Tips. No page errors. `npm run lint` and `npm run build` passed.
+
 ### Other choices
 
 - Dark is the default. `src/layouts/Layout.astro` puts `data-theme="dark"` on `<html>`. The boot script stays on dark unless `localStorage` is exactly `"light"` or `"dark"`. `src/scripts/theme.ts` uses the same rule when nothing is stored. A later operating-system theme change still overwrites that choice. That listener was not exercised.
