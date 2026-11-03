@@ -244,7 +244,7 @@ Headless Chrome on the preview: the nav was Posts, About Me, Roll Call, CV, Arch
 
 ### Home intro (2 Nov 2026)
 
-The home blurb in `src/pages/index.astro` now starts "Hi, I'm James Terrell, and this is my personal website." It says most posts are about Nutanix, and other posts will cover AI, Citrix, Linux, Microsoft, and World of Warcraft. The last sentence links to the About Me page. The about page still says "Jamie Terrell."
+The home blurb in `src/pages/index.astro` is "Hi, I'm James Terrell. This is my personal site. Most posts are Nutanix. The rest is AI, Citrix, Linux, Microsoft, and an unhealthy obsession with World of Warcraft." The last sentence links to the About Me page. The about page still says "Jamie Terrell."
 
 ### Other choices
 
