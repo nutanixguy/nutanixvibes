@@ -44,19 +44,26 @@ function pathnameOf(page: string): string {
   return new URL(page).pathname.replace(/\/$/, "") || "/";
 }
 
-const legacyPaths = new Set(
-  Object.keys(legacyRedirects).map(path => path.replace(/\/$/, "") || "/")
+// /start-here/ was a reading list. That copy now lives on /about/.
+const retiredRedirects: Record<string, string> = {
+  "/start-here": "/about/",
+};
+
+const redirectPaths = new Set(
+  [...Object.keys(legacyRedirects), ...Object.keys(retiredRedirects)].map(
+    path => path.replace(/\/$/, "") || "/"
+  )
 );
 
 export default defineConfig({
   site: config.site.url,
-  redirects: legacyRedirects,
+  redirects: { ...legacyRedirects, ...retiredRedirects },
   integrations: [
     mdx(),
     sitemap({
       filter: page => {
         const path = pathnameOf(page);
-        if (path === "/certifications" || legacyPaths.has(path)) return false;
+        if (path === "/certifications" || redirectPaths.has(path)) return false;
         return (
           config.features?.showArchives !== false ||
           !page.endsWith("/archives/")

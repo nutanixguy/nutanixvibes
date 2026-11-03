@@ -5,8 +5,8 @@ export interface UIStrings {
     tags: string;
     about: string;
     archives: string;
+    cv: string;
     search: string;
-    startHere: string;
     rollCall: string;
   };
   post: {
