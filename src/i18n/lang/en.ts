@@ -5,10 +5,10 @@ export default {
     home: "Home",
     posts: "Posts",
     tags: "Tags",
-    about: "About me",
+    about: "About Me",
     archives: "Archives",
+    cv: "CV",
     search: "Search",
-    startHere: "Start here",
     rollCall: "Roll Call",
   },
   post: {

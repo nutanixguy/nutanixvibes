@@ -1,5 +1,5 @@
 ---
-title: About me
+title: About Me
 description: "Jamie Terrell, infrastructure engineer. Nutanix, Citrix, Azure, and the problems worth writing down."
 ---
 
@@ -15,6 +15,15 @@ Over the years I've solved a lot of problems that weren't well-documented anywhe
 
 I write what I wish I could've Googled.
 
+**If you only have time for one post**
+
+Use the level badge on the card.
+
+- **Beginner** means you need Prism Central open, not a design document.
+- **Intermediate** means you already know the product names and you are deciding what to plan.
+
 Based in Georgia. Opinions are my own.
 
 Get in touch: [jamie@nutanixguy.com](mailto:jamie@nutanixguy.com)
+
+The CV is at <a href="https://cv.nutanixvibes.com/" target="_blank" rel="noopener noreferrer">cv.nutanixvibes.com</a>.

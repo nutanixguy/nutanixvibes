@@ -73,11 +73,11 @@ The home hero, Jamie's logo, and the two post covers are WebP files in `src/asse
 | `src/pages/certifications.astro` | Static redirect to `/about#certifications`. Not a content page. |
 | `src/pages/[...slug]/` | One post page per file in `src/content/posts/`, served at `/{slug}/`. |
 | `src/pages/` | Other routes. A file here becomes a URL. The posts list stays at `/posts/`. `/github-stats` and `/quest` are not published. |
-| `src/components/Header.astro` | Nav. Start here and Roll Call are in this list. Certifications, GitHub stats, and Quest are not. |
+| `src/components/Header.astro` | Nav. About Me and Roll Call are in this list. Start here, Certifications, GitHub stats, and Quest are not. |
 | `src/data/roll-call.yaml` | The peer blogs. One list item per blog. `id` is the sort order and is not shown. |
 | `src/pages/roll-call.astro` | The `/roll-call/` page. |
 | `src/components/RollCallCard.astro` | One card: name, optional author, language, focus, external link. |
-| `src/components/Card.astro` | Post card on the home page, the posts list, and Start here. |
+| `src/components/Card.astro` | Post card on the home page and the posts list. |
 | `src/components/PostMeta.astro` | Level and topic badges, plus the "Before you start" block on a post. |
 | `src/layouts/Layout.astro` | HTML shell, fonts, and the script that sets dark mode before the first paint. |
 | `src/styles/theme.css` | Colors. Dark is the default on `:root`. Light is `[data-theme="light"]`. Hex values are cited in section 5. |
@@ -218,6 +218,20 @@ The URL stays `/about/`. `nav.about` in `src/i18n/lang/en.ts` is "About me". Tha
 
 The breadcrumb used Tailwind `capitalize`. That would render the new label as "About Me". `src/components/Breadcrumb.astro` now leaves a named nav item as written. A tag slug still gets `capitalize`.
 
+The label and the Start here page changed again the same day. See the decision below.
+
+### Start here folds into About Me (2 Nov 2026)
+
+`/start-here/` was a one-sentence bio, the Beginner and Intermediate key, and the same post cards already on `/` and `/posts/`. With two posts, that was a second About page. The bio stays in `src/content/pages/about.md`. The badge key moved into that file, under "If you only have time for one post". The post cards did not move. Home and `/posts/` already list them.
+
+`src/pages/start-here.astro` is deleted. `astro.config.ts` redirects `/start-here` to `/about/` and the sitemap filter drops that path. `start-here` stays in `RESERVED_ROOT_SEGMENTS` in `src/utils/getPostPaths.ts` so a post cannot take the old URL. The nav item is gone from `src/components/Header.astro`. `nav.startHere` is gone from `src/i18n/lang/en.ts` and `src/i18n/types.ts`. The home intro in `src/pages/index.astro` now links to About Me.
+
+`nav.about` and the about `title` are "About Me". That is the nav, the breadcrumb, the h1, and the document title. The URL stays `/about/`.
+
+The About Me page links to the CV at `https://cv.nutanixvibes.com/`. On 2 Nov 2026 that URL returned HTTP 200 and the title was "Infrastructure Architect • James R. Terrell". `https://cv.nutanixvibes.com/cv` returned HTTP 404, so both links use the site root. Each link is `target="_blank"` and `rel="noopener noreferrer"`.
+
+The nav also has that URL, immediately before the archive icon, in `src/components/Header.astro`. The mark is `src/assets/icons/IconCv.svg`: a document outline with a C and a V drawn as strokes, same 24px grid as `IconArchive.svg`. Desktop shows the icon. The phone menu shows the word from `nav.cv` in `src/i18n/lang/en.ts`, the same pattern as Archives. The accessible name is "CV, opens in a new tab".
+
 ### Other choices
 
 - Dark is the default. `src/layouts/Layout.astro` puts `data-theme="dark"` on `<html>`. The boot script stays on dark unless `localStorage` is exactly `"light"` or `"dark"`. `src/scripts/theme.ts` uses the same rule when nothing is stored. A later operating-system theme change still overwrites that choice. That listener was not exercised.
@@ -229,7 +243,7 @@ The breadcrumb used Tailwind `capitalize`. That would render the new label as "A
 - Timezone `America/New_York` is an assumption. The about page says "Based in Georgia." The removed author file on `main` (`src/content/authors/jamie.json`) said "Georgia, USA". If that Georgia is the country, this timezone is wrong.
 - `features.editPost.enabled` is false. The theme default pointed at `github.com/satnaing/astro-paper`.
 - The About certification cards are the curated LinkedIn set in `src/content/certifications/`. Older and expired credentials from that same LinkedIn read are not in the YAML. The About prose still mentions a broader set in passing.
-- Start here is in the nav. `/quest` and `/github-stats` are not published.
+- `/quest` and `/github-stats` are not published. Start here is no longer a page. See the decision above.
 - `package.json` overrides `@astrojs/markdown-satteri` to `0.4.6`. See section 7.
 - AstroPaper's own `.github/workflows/ci.yml` uses pnpm and runs on pull requests. It was not copied. The template has no deploy workflow, so there was nothing to delete. This branch's only workflow is the original `deploy.yml`.
 
@@ -411,6 +425,20 @@ Same preview, after the label edit. `npm run lint`, `npm run format:check`, and 
 Headless Chrome loaded `/about/` directly. The path stayed `/about/`. The document title was `About me | Nutanix Vibes`. The h1, the nav link, and the breadcrumb text were `About me`. The breadcrumb computed `text-transform` was `none`. The nav link had the active class. `/start-here/` linked to `/about/` with the text `About me`. At 390px the menu showed `About me`. No page errors on that pass.
 
 Screenshots: `screenshot_about_me_desktop.png` and `screenshot_about_me_mobile_menu.png` under `/opt/cursor/artifacts/`.
+
+### Smoke test for folding Start here into About Me (2 Nov 2026)
+
+Same checks after this edit: `npm run lint` passed, `npm run format:check` passed, `npm run build` passed. `astro check` reported 0 errors. The build wrote 17 pages. `/start-here/index.html` is the redirect. `dist/sitemap-0.xml` does not contain `start-here`. Pagefind still indexed 2 pages and 520 words.
+
+Headless Chrome on the preview, no page errors:
+
+- `/` nav labels were Posts, Tags, About Me, Roll Call, CV, Archives, Search. No Start here link.
+- The CV link href was `https://cv.nutanixvibes.com/`, `target="_blank"`, `rel="noopener noreferrer"`, accessible name "CV, opens in a new tab".
+- `/about/` h1, nav, and breadcrumb were "About Me". The page text included "Beginner". The CV link in the article had `rel="noopener noreferrer"`.
+- At 390px the open menu showed the word CV between Roll Call and Archives.
+- Opening `/start-here/` ended at `/about/`.
+
+Screenshots: `screenshot_nav_cv_desktop.png`, `screenshot_nav_cv_mobile.png`, and `screenshot_about_me_combined.png` under `/opt/cursor/artifacts/`.
 
 ## 7. Lessons learned
 
