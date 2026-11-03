@@ -1,13 +1,13 @@
 ---
 title: About Me
-description: "Jamie Terrell, infrastructure engineer. Nutanix, Citrix, Azure, and the problems worth writing down."
+description: "Jamie Terrell, platform engineer. Nutanix, Citrix, Azure, and the problems worth writing down."
 ---
 
 Hi, I'm Jamie Terrell.
 
-I've been fixing IT problems since before virtualization was cool—30+ years and counting. These days I'm an infrastructure engineer at Pediatrix Medical Group, where I keep Nutanix clusters, Citrix environments, and Azure workloads running for healthcare teams who can't afford downtime.
+I've been fixing IT problems since before virtualization was cool, 30+ years and counting. These days I'm a platform engineer at Pediatrix Medical Group, where I keep Nutanix clusters, Citrix environments, and Azure workloads running for healthcare teams who can't afford downtime.
 
-I'm a Nutanix Technology Champion with certifications across Nutanix (NCP-MCI, NCP-MCA), Citrix (CCP-V, CC-VAD-CC), Microsoft Azure, and CompTIA Security+. Most of my career has been in healthcare IT, where "the system is down" means something different than it does in most industries.
+I'm a Nutanix Technology Champion. Most of my career has been in healthcare IT, where "the system is down" means something different than it does in most industries.
 
 **Why this blog?**
 

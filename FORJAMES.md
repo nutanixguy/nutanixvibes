@@ -238,6 +238,10 @@ Tags left the header. `src/components/Header.astro` no longer links to `/tags/`.
 
 Headless Chrome on the preview: the nav was Posts, About Me, Roll Call, CV, Archives, Search. `/search/` had an h2 "Tags" and six chips: AHV, CVM, NGT, Nutanix, Prism Central, Tips. No page errors. `npm run lint` and `npm run build` passed.
 
+### About Me copy (2 Nov 2026)
+
+`src/content/pages/about.md` now says "cool, 30+ years and counting" and "platform engineer". The page description uses platform engineer too. The acronym list came out of the second paragraph. The certification cards below that paragraph already show the curated set. "Why this blog?" is unchanged.
+
 ### Other choices
 
 - Dark is the default. `src/layouts/Layout.astro` puts `data-theme="dark"` on `<html>`. The boot script stays on dark unless `localStorage` is exactly `"light"` or `"dark"`. `src/scripts/theme.ts` uses the same rule when nothing is stored. A later operating-system theme change still overwrites that choice. That listener was not exercised.
