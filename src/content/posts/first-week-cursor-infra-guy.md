@@ -20,7 +20,6 @@ objectives:
   - Know a few guardrails to set before you let an agent near anything
 ---
 
-
 So I'm not a developer. My day job is platform engineering: clusters, VDI, change windows. I can read a script and fix a YAML file, but I've never thought of myself as someone who ships code.
 
 A few weeks ago I upgraded to a plan that covers Grok, Grok Bot and Cursor. Grok Bots had just come out, so I jumped in. This post is what I actually did with Cursor since then, written for other infra people who keep hearing about it and aren't sure where to start.

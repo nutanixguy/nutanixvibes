@@ -14,6 +14,8 @@ AstroPaper is the MIT-licensed theme at https://github.com/satnaing/astro-paper.
 
 Think of this branch as a golden image you built in a lab VLAN. It is bootable. It is not in the production cluster, and the runbook that promotes images (`deploy.yml`) still only watches `main`.
 
+An unlisted post is a VM that is powered on and reachable if you already know the address. It is not in the inventory export, the monitoring scrape, or the search index. Set `unlisted: true` in the post's frontmatter. The page is still written to `dist/{slug}/index.html`. Lists, the feed, the sitemap, and Pagefind skip it.
+
 ## 2. Architecture
 
 Astro is a static site generator. At build time it reads markdown, YAML, and templates and writes plain HTML into `dist/`. After the build, nothing in this preview calls GitHub, Algolia, or any other API. Hosting the result is the same idea as publishing a file share: the web server only has to hand out files.
@@ -51,6 +53,20 @@ flowchart TD
 
 `public/pagefind/` is gitignored (`.gitignore`). It exists so a later `astro dev` can serve an index you already built. `astro preview` serves `dist/`, which already contains the index.
 
+Which posts show up in a list is one predicate, `postFilter` in `src/utils/postFilter.ts`. Home, `/posts/`, tags, archives, RSS, and the previous/next links all go through it (directly, or through `getSortedPosts` / `getUniqueTags`). A second function in that file, `shouldBuildPostPage`, decides whether `/{slug}/` is written. Unlisted posts fail the first check and pass the second, including when `pubDatetime` is still in the future. Drafts fail both. The sitemap cannot call `postFilter` (that needs the content collection, and `astro.config.ts` loads before that). `src/utils/unlistedPostPaths.ts` reads the same `unlisted: true` flag from disk and `astro.config.ts` drops those URLs.
+
+```mermaid
+flowchart TD
+  file["src/content/posts/*.md"]
+  file --> buildGate["shouldBuildPostPage"]
+  file --> listGate["postFilter"]
+  buildGate --> page["dist/slug/index.html"]
+  listGate --> lists["home, /posts/, tags, archives, RSS, prev/next"]
+  file --> scan["unlistedPostPaths.ts"]
+  scan --> sitemap["sitemap filter in astro.config.ts"]
+  page --> pagefind["Pagefind keeps pages that set data-pagefind-body"]
+```
+
 The certification YAML is not its own page. `src/pages/about.astro` renders it at `/about#certifications`. `src/pages/certifications.astro` is a meta refresh to that anchor.
 
 The roll call YAML is its own page. `src/pages/roll-call.astro` loads the `rollCall` collection and `astro build` writes `dist/roll-call/index.html`. The 2 Nov 2026 build included that URL in `dist/sitemap-0.xml` as `https://nutanixvibes.com/roll-call/`.
@@ -63,15 +79,22 @@ The home hero, Jamie's logo, and the two post covers are WebP files in `src/asse
 | --- | --- |
 | `docs/LAUNCH-CHECKLIST.md` | One-time pre-launch list for the nutanixvibes.com cutover. Not a site page. |
 | `astro-paper.config.ts` | Site name, URL, author, timezone, social links, Pagefind on, edit-post link off. This is the file you edit for site settings. |
-| `astro.config.ts` | Astro itself: Markdown plugins, sitemap, Tailwind, Google Sans Code, JetBrains Mono. |
+| `astro.config.ts` | Astro itself: Markdown plugins, sitemap, Tailwind, Google Sans Code, JetBrains Mono. The sitemap filter drops unlisted post URLs. |
 | `src/config.ts` | Applies defaults on top of `astro-paper.config.ts`. Do not put content here. |
-| `src/content.config.ts` | Schema for posts, pages, the certifications collection, and the roll call collection. Same role as a validated object schema in a Desired State config. |
-| `src/content/posts/` | The two migrated posts. |
+| `src/content/blogPath.ts` | The posts directory string, `src/content/posts`. Shared so the sitemap scan and the content loader point at the same folder. |
+| `src/content.config.ts` | Schema for posts, pages, the certifications collection, and the roll call collection. Same role as a validated object schema in a Desired State config. Posts accept optional `unlisted` (default false) and optional `draft`. |
+| `src/content/posts/` | Markdown posts. Each file is a page at `/{slug}/`. |
 | `src/content/pages/about.md` | About page prose. Same text as the old `src/data/about.md` on `main`. |
 | `src/pages/about.astro` | Renders that prose, then the certifications section at `#certifications`. Jamie's logo is the profile image under the heading. |
 | `src/content/certifications/` | Curated Nutanix and Citrix credentials from Jamie's LinkedIn, read 1 Nov 2026. No expiry dates. |
 | `src/pages/certifications.astro` | Static redirect to `/about#certifications`. Not a content page. |
-| `src/pages/[...slug]/` | One post page per file in `src/content/posts/`, served at `/{slug}/`. |
+| `src/pages/[...slug]/` | One post page per built post, served at `/{slug}/`. Drafts are not built. Unlisted posts are built, with `noindex, nofollow` and without `data-pagefind-body`. |
+| `src/utils/postFilter.ts` | `postFilter` is the listing gate. `shouldBuildPostPage` is the page gate. |
+| `src/utils/postVisibility.ts` | `isDraftPost` and `isUnlistedPost`. No other imports, so the sitemap scan can use them. |
+| `src/utils/postSlug.ts` | Turns a post id and file path into `/{slug}`. Routes and the sitemap scan both call `getPostSlug`. |
+| `src/utils/unlistedPostPaths.ts` | Reads post frontmatter on disk and returns unlisted pathnames for the sitemap filter. |
+| `src/utils/getSortedPosts.ts` | Applies `postFilter`, sorts by last update, and picks previous/next from that list only. |
+| `src/utils/getUniqueTags.ts` | Tag index and tag pages. Uses `postFilter`, so a tag that exists only on unlisted posts is dropped. |
 | `src/pages/` | Other routes. A file here becomes a URL. The posts list stays at `/posts/`. `/github-stats` and `/quest` are not published. |
 | `src/components/Header.astro` | Nav. About Me and Roll Call are in this list. Start here, Certifications, GitHub stats, and Quest are not. |
 | `src/data/roll-call.yaml` | The peer blogs. One list item per blog. `id` is the sort order and is not shown. |
@@ -79,10 +102,11 @@ The home hero, Jamie's logo, and the two post covers are WebP files in `src/asse
 | `src/components/RollCallCard.astro` | One card: name, optional author, language, focus, external link. |
 | `src/components/Card.astro` | Post card on the home page and the posts list. |
 | `src/components/PostMeta.astro` | Level and topic badges, plus the "Before you start" block on a post. |
-| `src/layouts/Layout.astro` | HTML shell, fonts, and the script that sets dark mode before the first paint. |
+| `src/layouts/Layout.astro` | HTML shell, fonts, and the script that sets dark mode before the first paint. An unlisted post sets `data-pagefind-ignore="all"` on `<html>`. |
+| `src/layouts/PostLayout.astro` | Post shell around `Layout.astro`. An unlisted post adds `<meta name="robots" content="noindex, nofollow">`. |
 | `src/styles/theme.css` | Colors. Dark is the default on `:root`. Light is `[data-theme="light"]`. Hex values are cited in section 5. |
 | `src/styles/global.css` | Grid background and the scanline overlay. |
-| `src/pages/search.astro` | Pagefind UI. No Algolia. |
+| `src/pages/search.astro` | Pagefind UI. No Algolia. The tag chips under the box come from `getUniqueTags`, so unlisted-only tags are not shown. |
 | `src/assets/images/` | WebP masters for the home hero, Jamie's logo, and the two post covers. Encoded at quality 90. Astro resizes them at build time. |
 | `src/assets/site-images.ts` | Imports the hero and the logo, and holds the alt text the home and about pages share. |
 | `public/assets/images/` | Older files still copied as-is: `about-hero.jpg` and `cropped-image.jpg`. The two previous post covers were removed on 2 Nov 2026. |
@@ -352,6 +376,18 @@ Each blog link is `target="_blank"` and `rel="noopener noreferrer"`. The schema 
 
 Cards use the existing tokens in `src/styles/theme.css`: `bg-muted`, `border-border`, `text-accent`, `text-muted-foreground`. In Chrome on the preview, a dark card computed to `rgb(42, 42, 42)` (`#2a2a2a`), the link to `rgb(161, 136, 252)` (`#a188fc`), and the page background to `rgb(19, 19, 19)`. Light was `rgb(246, 246, 246)` (`#f6f6f6`), `rgb(120, 85, 250)` (`#7855fa`), and `rgb(255, 255, 255)`. At 1280px the grid was 2 columns. At 390px it was 1 column. Neither viewport had horizontal overflow.
 
+### Unlisted posts (4 Nov 2026)
+
+`unlisted` is an optional boolean on the posts schema in `src/content.config.ts`. It defaults to false. `draft` was already optional and was not given a new meaning.
+
+I kept two gates in `src/utils/postFilter.ts` instead of one flag inside `postFilter`. `postFilter` is what every list uses. If that function had also refused to build the page, `getStaticPaths` in `src/pages/[...slug]/index.astro` would have stopped emitting `/{slug}/`, because it used to call `getSortedPosts` for both the page and the previous/next links. The page gate is `shouldBuildPostPage`. Unlisted posts return true there even when `pubDatetime` is after the build day. They return false from `postFilter` in dev and in production. A draft returns false from both, including when `unlisted` is also true.
+
+The sitemap filter in `astro.config.ts` only receives a URL. It calls `isUnlistedSitemapPath` in `src/utils/unlistedPostPaths.ts`, which scans `src/content/posts/` for a top-level `unlisted: true` and skips drafts. That scan uses `isUnlistedPost` from `src/utils/postVisibility.ts`, the same check as the two gates. I did not import `astro:content` from `astro.config.ts`. That module is not available while the config loads.
+
+Pagefind's own docs say that once any page has `data-pagefind-body`, pages without it are not indexed. This site already marks posts with that attribute. An unlisted post omits it. `<html>` also gets `data-pagefind-ignore="all"`. `data-pagefind-ignore` by itself does not remove a page. The build log is the check that mattered. See the smoke test below.
+
+Rejected: treating unlisted as a second draft (the URL would 404). Rejected: leaving future unlisted posts on the normal schedule filter (Jamie could not open the URL before publish day). Rejected: a `robots.txt` `Disallow` rule. The request was a noindex meta tag and a sitemap exclusion, and `src/pages/robots.txt.ts` still says `Allow: /`.
+
 ## 6. How to run and test
 
 From the repo root, on Node 22.23.4 or newer:
@@ -454,6 +490,42 @@ Headless Chrome on the preview, no page errors:
 
 Screenshots: `screenshot_nav_cv_desktop.png`, `screenshot_nav_cv_mobile.png`, and `screenshot_about_me_combined.png` under `/opt/cursor/artifacts/`.
 
+### Smoke test for unlisted posts (4 Nov 2026)
+
+Node `v22.23.4`, npm `10.9.9`. `npm ci` in this session installed 578 packages.
+
+The committed tree, after the temporary posts below were deleted:
+
+1. `npm run format:check` passed. The first run failed on `src/content/posts/first-week-cursor-infra-guy.md` only. That file was already on `main`. Prettier wanted one blank line removed after the closing `---`. I removed that line. The post text did not change. The second `npm run format:check` passed.
+2. `npm run lint` passed (exit 0, no findings).
+3. `npm run build` passed. `astro check` reported 0 errors, 0 warnings, 0 hints. The log said 21 pages. Pagefind v1.6.0 indexed 3 pages and 851 words, and printed `Ignoring pages without this tag.`
+
+Before that, the same source plus four temporary posts was built, and then those files were deleted. They are not in the commit.
+
+| File | Frontmatter that mattered |
+| --- | --- |
+| `src/content/posts/unlisted-marker-6dd8.md` | `unlisted: true`, `featured: true`, `pubDatetime: 2026-11-01`, tags `Nutanix` and `UnlistedOnly6dd8`, no `ogImage` |
+| `src/content/posts/future-unlisted-marker-6dd8.md` | `unlisted: true`, `pubDatetime: 2027-06-01`, tag `FutureUnlistedOnly6dd8` |
+| `src/content/posts/draft-marker-6dd8.md` | `draft: true`, `pubDatetime: 2026-11-01` |
+| `src/content/posts/draft-and-unlisted-marker-6dd8.md` | `draft: true` and `unlisted: true` |
+
+That build's route list included `/unlisted-marker-6dd8/index.html`, `/future-unlisted-marker-6dd8/index.html`, and both `index.png` files. It did not include either draft. The summary line said 23 pages. Pagefind still indexed 3 pages and 851 words.
+
+I grepped `dist/` after that build:
+
+- Both unlisted HTML files contained `<meta name="robots" content="noindex, nofollow">` and `data-pagefind-ignore="all"` on `<html>`. Neither contained `data-pagefind-body`.
+- `dist/first-week-cursor-infra-guy/index.html` contained `data-pagefind-body="true"` and no robots meta.
+- These files had none of the marker titles, marker strings, or unlisted slugs: `dist/index.html`, `dist/posts/index.html`, `dist/tags/index.html`, `dist/tags/nutanix/index.html`, `dist/archives/index.html`, `dist/rss.xml`, `dist/search/index.html`, `dist/sitemap-0.xml`, `dist/sitemap-index.xml`.
+- `dist/rss.xml` still had the three public posts.
+- `dist/index.html` had no `id="featured"` section. The unlisted post was `featured: true`.
+- These directories were absent: `dist/tags/unlistedonly6dd8`, `dist/tags/futureunlistedonly6dd8`, `dist/tags/draftonly6dd8`, `dist/tags/draftandunlistedonly6dd8`.
+- `dist/sitemap-0.xml` listed the three public post URLs and did not list `unlisted-marker-6dd8`, `future-unlisted-marker-6dd8`, or their `index.png` URLs.
+- A search of `dist/pagefind/` found no marker and no unlisted slug.
+- The three public post HTML files did not link to either unlisted slug.
+- `dist/unlisted-marker-6dd8/index.html` did link to `/prism-central-tip-use-the-view-by-dropdown-for-faster-vm-audits/` and `/first-week-cursor-infra-guy/` (older and newer public neighbors). It also linked to `/tags/unlistedonly6dd8/`, and that tag page was not built.
+
+I did not open a browser. The checks above are the built files. `npm run dev` was not run. A GitHub Pages deploy was not run.
+
 ## 7. Lessons learned
 
 The post template only drew a cover when `ogImage` was a root-relative string (`src/pages/[...slug]/index.astro`, the `coverSrc` check). A relative path still becomes image metadata, and the old code already copied `.src` into the `og:image` meta tag. If I had only edited the frontmatter, the share image would have changed and the page would have shown no picture. The template now renders metadata with `<Image>` and keeps the string branch for a file in `public/`.
@@ -476,6 +548,12 @@ The first full-page screenshot of `/roll-call/` showed the home hero underneath 
 
 Medium returned HTTP 403 to Python's urllib and the article was still up when fetched another way. One client status was not enough to call the blog dead. I kept the entry after the second fetch showed the NKP article and the rest of the profile.
 
+`npm run format:check` failed on the first run of this unlisted change, on `src/content/posts/first-week-cursor-infra-guy.md`, which this change had not edited. Prettier rejected one extra blank line after the closing `---`. That line was already on `main`. I deleted it. Next time, diff the file before treating a red format check as a regression from the edit.
+
+The post page list and the public list used to be the same call: `getSortedPosts` inside `getStaticPaths` in `src/pages/[...slug]/index.astro`. Putting `unlisted` only into `postFilter` would have dropped the URL as well as the lists. The build with the temporary posts is what showed the split working: both unlisted HTML files were in the route list, and the listing files did not mention them.
+
+`data-pagefind-ignore` does not by itself remove a page from Pagefind. The Pagefind docs say it skips that element. Once any page on the site has `data-pagefind-body`, pages without it are ignored. The 4 Nov build log printed `Ignoring pages without this tag.` and still indexed 3 pages while the unlisted HTML was in `dist/`. Those pages omitted `data-pagefind-body` and also set `data-pagefind-ignore="all"` on `<html>`. I did not build a page that sets both `data-pagefind-body` and `data-pagefind-ignore="all"`, so I do not know which one wins if both are present.
+
 ## 8. Open questions and known gaps
 
 - Merging this branch would change production. `deploy.yml` on `main` would build this tree and deploy it. That deploy was not run. Do not merge unless that deploy is what you want.
@@ -491,7 +569,7 @@ Medium returned HTTP 403 to Python's urllib and the article was still up when fe
 - No axe scan and no screen reader pass. The image work was opened at 390, 640, 768, and 1280px in headless Chrome. That is not a physical phone. The earlier desktop-only note above is about the color pass, not this image pass.
 - The home page and the about page still share `public/og.jpg`. The new hero and the logo are not their `og:image`. A share-card debugger was not run.
 - `cropped-image.jpg` in `public/assets/images/` is still unused by the templates. I did not delete it.
-- `features.dynamicOgImage` is still on. Posts that set `ogImage` skip the generated PNG (`src/pages/[...slug]/index.png.ts`). `/og.png` is still generated for the site fallback. A post with no `ogImage` was not tested.
+- `features.dynamicOgImage` is still on. Posts that set `ogImage` skip the generated PNG (`src/pages/[...slug]/index.png.ts` uses `shouldBuildPostPage`, so an unlisted post with no cover still gets one). `/og.png` is still generated for the site fallback. On 4 Nov 2026 the temporary unlisted posts had no `ogImage`, and the build wrote `dist/unlisted-marker-6dd8/index.png` and `dist/future-unlisted-marker-6dd8/index.png`. Those URLs were not in `dist/sitemap-0.xml`. A public post with no `ogImage` was not tested.
 - Font download needs network at build time. An offline build was not tested.
 - Upstream AstroPaper CI (pnpm, Node 24) was not added. This branch has no PR lint workflow of its own. Lint was run locally.
 - `/roll-call/` is not in the Pagefind index. It does not set `data-pagefind-body`. A search for one of these blog names was not run.
@@ -501,3 +579,7 @@ Medium returned HTTP 403 to Python's urllib and the article was still up when fe
 - Wei-Ren Wang comes from the MVP and vExpert link text on the owner page, not from a sentence that says "my name is".
 - The roll call was checked at 390px and 1280px in headless Chrome. That is not a physical phone. No axe scan and no screen reader pass on this page.
 - `public/favicon.ico` is still missing. `src/layouts/Layout.astro` requests it, and the preview logged a 404. I did not add the file.
+- An unlisted post still renders its own tag links. If none of the listed posts use that tag, `getUniqueTags` does not build `/tags/{tag}/`, and the link 404s. The temporary post linked to `/tags/unlistedonly6dd8/`, and that directory was not in `dist/`. A tag that listed posts also use, such as `Nutanix`, still has a page, and the unlisted post was not on it.
+- `src/pages/robots.txt.ts` still says `Allow: /`. An unlisted URL can be fetched. The page asks crawlers not to index it, and the sitemap omits it. I did not add a `Disallow`.
+- `src/utils/unlistedPostPaths.ts` treats only the YAML tokens `true`, `True`, and `TRUE` as unlisted. The posts schema is `z.boolean()`, so other values fail `astro build` before the sitemap scan matters. A filename that `slugifyStr` and Astro's `github-slugger` id disagree on was not tested. The temporary files were already kebab-case, and their URLs were absent from `dist/sitemap-0.xml`.
+- `npm run dev` was not used to confirm an unlisted post stays off the lists in dev. `postFilter` returns false for `unlisted: true` before the dev schedule shortcut. That is what the code says. I did not watch the dev server.

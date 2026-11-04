@@ -5,7 +5,7 @@ import satori from "satori";
 import sharp from "sharp";
 import { getFontPathByWeight } from "@/utils/getFontPathByWeight";
 import { assertPostRouteAvailable, getPostSlug } from "@/utils/getPostPaths";
-import { postFilter } from "@/utils/postFilter";
+import { shouldBuildPostPage } from "@/utils/postFilter";
 import config from "@/config";
 
 export async function getStaticPaths() {
@@ -14,7 +14,7 @@ export async function getStaticPaths() {
   }
 
   const posts = await getCollection("posts").then(p =>
-    p.filter(post => postFilter(post) && !post.data.ogImage)
+    p.filter(post => shouldBuildPostPage(post) && !post.data.ogImage)
   );
 
   return posts.map(post => {

@@ -12,7 +12,8 @@ import {
   getPostSlug,
   getPostUrl,
 } from "@/utils/getPostPaths";
-import { getSortedPosts } from "@/utils/getSortedPosts";
+import { adjacentListedPosts, getSortedPosts } from "@/utils/getSortedPosts";
+import { shouldBuildPostPage } from "@/utils/postFilter";
 import { slugifyStr } from "@/utils/slugify";
 import { toTransitionName } from "@/utils/toTransitionName";
 import EditPost from "./_components/EditPost.astro";
@@ -24,33 +25,15 @@ import config from "@/config";
 
 export async function getStaticPaths() {
   const posts = await getCollection("posts");
-  const sortedPosts = getSortedPosts(posts);
+  // Neighbors come from the listing filter, so an unlisted post is never one.
+  const listedPosts = getSortedPosts(posts);
 
-  return sortedPosts.map((post, index) => {
+  return posts.filter(shouldBuildPostPage).map(post => {
     assertPostRouteAvailable(post.id, post.filePath);
+    const { prevPost, nextPost } = adjacentListedPosts(post, listedPosts);
     return {
       params: { slug: getPostSlug(post.id, post.filePath) },
-      props: {
-        post,
-        // sortedPosts is newest-first, so "older" (prev) is a higher index
-        // and "newer" (next) is a lower index.
-        prevPost:
-          index < sortedPosts.length - 1
-            ? {
-                id: sortedPosts[index + 1].id,
-                title: sortedPosts[index + 1].data.title,
-                filePath: sortedPosts[index + 1].filePath,
-              }
-            : null,
-        nextPost:
-          index > 0
-            ? {
-                id: sortedPosts[index - 1].id,
-                title: sortedPosts[index - 1].data.title,
-                filePath: sortedPosts[index - 1].filePath,
-              }
-            : null,
-      },
+      props: { post, prevPost, nextPost },
     };
   });
 }
@@ -87,6 +70,7 @@ const {
   objectives,
   est_minutes,
   updated,
+  unlisted,
 } = post.data;
 
 const { Content } = await render(post);
@@ -147,6 +131,8 @@ const coverWidths = coverImage
   canonicalURL={canonicalURL}
   pubDatetime={pubDatetime}
   modDatetime={modDatetime}
+  robots={unlisted ? "noindex, nofollow" : undefined}
+  pagefindIgnore={unlisted}
 >
   <Header />
 
@@ -155,7 +141,7 @@ const coverWidths = coverImage
   <main
     id="main-content"
     class:list={["app-layout", { "mt-8": !config.features.showBackButton }]}
-    data-pagefind-body
+    data-pagefind-body={unlisted ? undefined : true}
   >
     <h1
       style={{ viewTransitionName: toTransitionName(post.id) }}

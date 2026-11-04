@@ -29,6 +29,15 @@ npm run preview
 ## Content
 
 - Posts: `src/content/posts/`
+
+### Unlisted posts
+
+Add `unlisted: true` to a post's frontmatter when the page should exist at `/{slug}/` but stay out of the public lists. The field is optional and defaults to false.
+
+An unlisted post is still built. It is left out of the home page, `/posts/` (including pagination), tag pages and the tag index, archives, `rss.xml`, the sitemap, Pagefind, and the previous/next links on other posts. Its HTML includes `<meta name="robots" content="noindex, nofollow">`.
+
+`draft: true` is unchanged: the page is not built, even if `unlisted` is also set. An unlisted post whose `pubDatetime` is still in the future is built anyway, so you can open the URL before that day. It still does not appear in any list.
+
 - About page: `src/content/pages/about.md`
 - Example certifications: `src/content/certifications/`
 - Site config: `astro-paper.config.ts`

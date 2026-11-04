@@ -10,6 +10,7 @@ import Footer from "@/components/Footer.astro";
 import Tag from "@/components/Tag.astro";
 import { getAssetPath } from "@/utils/withBase";
 import { getUniqueTags } from "@/utils/getUniqueTags";
+import { postFilter } from "@/utils/postFilter";
 import { useTranslations } from "@/i18n";
 import config from "@/config";
 
@@ -28,9 +29,7 @@ const backUrl = config.features.showBackButton
 const pagefindBundlePath = getAssetPath("pagefind/");
 
 const t = useTranslations(locale);
-const tags = getUniqueTags(
-  await getCollection("posts", ({ data }) => !data.draft)
-);
+const tags = getUniqueTags(await getCollection("posts", postFilter));
 ---
 
 <Layout title={`${t.pages.searchTitle} | ${config.site.title}`}>

@@ -2,8 +2,9 @@ import { defineCollection } from "astro:content";
 import { z } from "astro/zod";
 import { file, glob } from "astro/loaders";
 import config from "@/config";
+import { BLOG_PATH } from "@/content/blogPath";
 
-export const BLOG_PATH = "src/content/posts";
+export { BLOG_PATH };
 
 const posts = defineCollection({
   loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: `./${BLOG_PATH}` }),
@@ -15,6 +16,8 @@ const posts = defineCollection({
       title: z.string(),
       featured: z.boolean().optional(),
       draft: z.boolean().optional(),
+      // Built at /{slug}/, but left out of listings, feeds, sitemap, and search.
+      unlisted: z.boolean().default(false),
       tags: z.array(z.string()).default(["others"]),
       // Root-relative public files stay strings. Relative paths still use Astro's
       // image helper so files under src/ can be optimized.
