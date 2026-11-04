@@ -19,6 +19,7 @@ import {
 import { transformerFileName } from "./src/utils/transformers/fileName";
 import { rehypeTableWrapper } from "./src/utils/rehypeTableWrapper";
 import config from "./astro-paper.config";
+import { isUnlistedSitemapPath } from "./src/utils/unlistedPostPaths";
 
 // Real URLs from the Casper build on main that this theme no longer serves.
 // Post URLs stay at /{slug}/, so they are not in this list.
@@ -64,6 +65,8 @@ export default defineConfig({
       filter: page => {
         const path = pathnameOf(page);
         if (path === "/certifications" || redirectPaths.has(path)) return false;
+        // Unlisted posts are built. Keep the URL and its generated files out.
+        if (isUnlistedSitemapPath(path)) return false;
         return (
           config.features?.showArchives !== false ||
           !page.endsWith("/archives/")

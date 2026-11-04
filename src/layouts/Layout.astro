@@ -12,6 +12,8 @@ type Props = {
   ogImage?: string;
   ogImageAlt?: string;
   canonicalURL?: string;
+  /** Drop the whole document from Pagefind. Unlisted posts set this. */
+  pagefindIgnore?: boolean;
 };
 
 const { site } = config;
@@ -22,6 +24,7 @@ const {
   ogImage = resolveDefaultOgImagePath(config),
   ogImageAlt,
   canonicalURL = new URL(Astro.url.pathname, Astro.site).href,
+  pagefindIgnore = false,
 } = Astro.props;
 
 const socialImageURL = new URL(ogImage, Astro.site ?? Astro.url);
@@ -34,6 +37,7 @@ const rssHref = getAssetPath("rss.xml");
   lang={Astro.currentLocale ?? site.lang}
   data-theme="dark"
   class="dark overflow-y-scroll scroll-smooth"
+  data-pagefind-ignore={pagefindIgnore ? "all" : undefined}
 >
   <head>
     <meta charset="UTF-8" />

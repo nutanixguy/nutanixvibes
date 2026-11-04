@@ -10,6 +10,8 @@ type Props = {
   canonicalURL?: string;
   pubDatetime?: Date;
   modDatetime?: Date | null;
+  robots?: string;
+  pagefindIgnore?: boolean;
 };
 
 const { site } = config;
@@ -22,6 +24,8 @@ const {
   canonicalURL,
   pubDatetime,
   modDatetime,
+  robots,
+  pagefindIgnore,
 } = Astro.props;
 
 const structuredData = {
@@ -41,10 +45,18 @@ const structuredData = {
 };
 ---
 
-<Layout {title} {description} {ogImage} {ogImageAlt} {canonicalURL}>
+<Layout
+  {title}
+  {description}
+  {ogImage}
+  {ogImageAlt}
+  {canonicalURL}
+  {pagefindIgnore}
+>
   <Fragment slot="head">
     <!-- Override og:type for article pages -->
     <meta property="og:type" content="article" />
+    {robots && <meta name="robots" content={robots} />}
 
     {
       pubDatetime && (

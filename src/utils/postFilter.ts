@@ -4,24 +4,22 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import config from "@/config";
 import { resolveTimezone } from "./resolveTimezone";
+import { isDraftPost, isUnlistedPost } from "./postVisibility";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+type ScheduleData = {
+  pubDatetime: Date;
+  timezone?: string;
+};
+
 /**
- * Determines whether a post is eligible to be listed/rendered.
- *
- * - Excludes drafts always
- * - In production, excludes posts whose `pubDatetime` falls on a later calendar
- *   day than the build date, both read in the site (or per-post) timezone
- * - In dev, always shows non-draft posts to make authoring easier
- *
- * Publishing is day-granular by design: a post becomes visible on its
- * `pubDatetime` day, not at a time of day. `Datetime.astro` uses the same
- * timezone, so the byline shows that day unless a later `modDatetime` is set.
+ * Publishing is day-granular: a post is due on its `pubDatetime` day in the
+ * site (or per-post) timezone, not at a time of day. Dev shows future posts
+ * so authoring can see them. Production hides them until that day.
  */
-export function postFilter({ data }: CollectionEntry<"posts">) {
-  if (data.draft) return false;
+function isPublishedBySchedule(data: ScheduleData): boolean {
   if (import.meta.env.DEV) return true;
 
   const tz = resolveTimezone(data.timezone ?? config.site.timezone);
@@ -29,4 +27,31 @@ export function postFilter({ data }: CollectionEntry<"posts">) {
   const buildDay = dayjs().tz(tz).startOf("day");
 
   return !publishDay.isAfter(buildDay);
+}
+
+/**
+ * Listing gate for home, `/posts/`, tags, archives, RSS, and prev/next.
+ *
+ * - Drafts are excluded
+ * - Unlisted posts are excluded, including in dev and when they are future-dated
+ * - In production, posts dated after the build day are excluded
+ * - In dev, other non-draft posts stay visible
+ */
+export function postFilter(post: CollectionEntry<"posts">) {
+  if (isDraftPost(post.data)) return false;
+  if (isUnlistedPost(post.data)) return false;
+  return isPublishedBySchedule(post.data);
+}
+
+/**
+ * Pages to emit at `/{slug}/`.
+ *
+ * Drafts are not built. An unlisted post is built even when `pubDatetime` is
+ * still in the future, so the URL can be previewed. That override does not
+ * apply to `postFilter()`.
+ */
+export function shouldBuildPostPage(post: CollectionEntry<"posts">) {
+  if (isDraftPost(post.data)) return false;
+  if (isUnlistedPost(post.data)) return true;
+  return isPublishedBySchedule(post.data);
 }
