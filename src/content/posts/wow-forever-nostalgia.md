@@ -3,8 +3,8 @@ title: "WoW: Forever is hitting my nostalgia button, so I'm going Horde this tim
 description: "I mostly played WoW Classic on the Alliance side, then stepped away for years. WoW: Forever pulled me back, and this time I'm rolling a Troll Warlock on the Horde."
 ogImage: ../../assets/images/post-wow-forever-nostalgia.webp
 ogImageAlt: "Jamie at his desk playing WoW: Forever as Hexmon, a Troll Warlock"
-pubDatetime: 2026-11-10T14:00:00.000Z
-updated: 2026-11-10T14:00:00.000Z
+pubDatetime: 2026-11-05T12:37:00.000Z
+updated: 2026-11-05T12:37:00.000Z
 author: Jamie Terrell
 draft: false
 tags:
