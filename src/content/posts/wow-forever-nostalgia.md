@@ -6,7 +6,7 @@ ogImageAlt: "Jamie at his desk playing WoW: Forever as Hexmon, a Troll Warlock"
 pubDatetime: 2026-11-10T14:00:00.000Z
 updated: 2026-11-10T14:00:00.000Z
 author: Jamie Terrell
-draft: true
+draft: false
 tags:
   - Gaming
   - Personal
