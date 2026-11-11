@@ -15,7 +15,6 @@ tags:
 level: beginner
 topic: Licensing
 draft: false
-unlisted: true
 ---
 
 So you've got a Nutanix quote in front of you and it's full of NCI, NCM and NCP line items. If you've been around a while, you probably still think in AOS, Prism Pro and Calm, and plenty of older blog posts still use those names. Here's how I'd explain the current lineup to another admin.
